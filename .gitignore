@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.gapura/
+*.log
+.env
+.env.*
+.DS_Store
+coverage/
+docs/lighthouse/

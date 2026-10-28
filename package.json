@@ -1,0 +1,47 @@
+{
+  "name": "gapura",
+  "version": "0.1.0",
+  "description": "Catat panggilan LLM yang membawa data pribadi Indonesia; laporan Pasal 161 PP 33/2026. Lokal, open source.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Adinda Panca Mochamad",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adindamochamad/gapura.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "gapura": "./dist/cli/main.js"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./wrap": "./dist/wrap/wrapFetch.js",
+    "./report": "./dist/report/build.js"
+  },
+  "files": [
+    "dist",
+    "data",
+    "viewer",
+    "LICENSE",
+    "README.md",
+    "README.en.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "demo": "node dist/cli/main.js demo",
+    "lint:forbidden": "node scripts/check-forbidden-words.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@adindamochamad/tirai": "0.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "typescript": "5.7.2",
+    "vitest": "2.1.8"
+  }
+}
