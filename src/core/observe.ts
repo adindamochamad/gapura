@@ -102,6 +102,61 @@ export function observeHttpRequest(input: ObserveInput): ObserveOutput {
   return { entry, skippedReason: skip.reason };
 }
 
+function parseContentLength(headers: Headers): number | null {
+  const raw = headers.get("content-length");
+  if (raw === null || raw.trim() === "") return null;
+  const n = Number.parseInt(raw, 10);
+  if (!Number.isFinite(n) || n < 0) return null;
+  return n;
+}
+
+async function readStreamWithCap(
+  stream: ReadableStream<Uint8Array>,
+  maxBytes: number,
+): Promise<{ bodyText: string | null; bodyBytes: number; overLimit: boolean }> {
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  let overLimit = false;
+
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!value || value.byteLength === 0) continue;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        overLimit = true;
+        while (true) {
+          const next = await reader.read();
+          if (next.done) break;
+        }
+        break;
+      }
+      chunks.push(value);
+    }
+  } finally {
+    try {
+      await reader.cancel();
+    } catch {
+      /* ignore */
+    }
+  }
+
+  if (overLimit) {
+    return { bodyText: null, bodyBytes: total, overLimit: true };
+  }
+
+  const buf = new Uint8Array(total);
+  let offset = 0;
+  for (const c of chunks) {
+    buf.set(c, offset);
+    offset += c.byteLength;
+  }
+  const bodyText = new TextDecoder().decode(buf);
+  return { bodyText, bodyBytes: total, overLimit: false };
+}
+
 export async function readRequestBodyForObservation(
   request: Request,
   maxBytes = MAX_BYTES,
@@ -109,12 +164,24 @@ export async function readRequestBodyForObservation(
   if (request.method === "GET" || request.method === "HEAD") {
     return { bodyText: "", bodyBytes: 0 };
   }
-  const clone = request.clone();
-  const buf = await clone.arrayBuffer();
-  const bodyBytes = buf.byteLength;
-  if (bodyBytes > maxBytes) {
-    return { bodyText: null, bodyBytes };
+
+  const contentLength = parseContentLength(request.headers);
+  if (contentLength !== null && contentLength > maxBytes) {
+    return { bodyText: null, bodyBytes: contentLength };
   }
-  const bodyText = new TextDecoder().decode(buf);
+
+  const clone = request.clone();
+  const body = clone.body;
+  if (!body) {
+    return { bodyText: "", bodyBytes: 0 };
+  }
+
+  const { bodyText, bodyBytes, overLimit } = await readStreamWithCap(
+    body,
+    maxBytes,
+  );
+  if (overLimit) {
+    return { bodyText: null, bodyBytes: bodyBytes };
+  }
   return { bodyText, bodyBytes };
 }

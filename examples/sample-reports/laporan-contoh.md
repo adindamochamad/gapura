@@ -2,8 +2,8 @@
 
 **Bukan pendapat hukum.**
 
-Dibuat: 2026-10-28T06:31:40.453Z
-Periode log: 2026-10-28T06:31:40.432Z — 2026-10-28T06:31:40.451Z
+Dibuat: 2026-10-28T06:48:58.236Z
+Periode log: 2026-10-28T06:48:58.214Z — 2026-10-28T06:48:58.235Z
 Jumlah permintaan: 3
 
 Kutip Pasal 161 dari OCR legaltrans.id; belum dicocokkan ke JDIH resmi.
@@ -79,9 +79,9 @@ Butir h membahas format data yang dikirim — plain text, disamarkan, atau teren
 
 | Waktu | Penyedia | Host | Path | Status | PII (jenis×jumlah) | Wilayah (dok.) |
 | --- | --- | --- | --- | --- | --- | --- |
-| 2026-10-28T06:31:40.432Z | localhost / jaringan privat | 127.0.0.1 | /v1/chat/completions | raw | NIK: 1, TELEPON: 1, EMAIL: 1 | tidak keluar mesin (kategori khusus) (menurut dokumentasi penyedia, diakses 2026-10-28) |
-| 2026-10-28T06:31:40.448Z | localhost / jaringan privat | 127.0.0.1 | /v1/chat/completions | masked | — | tidak keluar mesin (kategori khusus) (menurut dokumentasi penyedia, diakses 2026-10-28) |
-| 2026-10-28T06:31:40.451Z | localhost / jaringan privat | 127.0.0.1 | /v1/chat/completions | clean | — | tidak keluar mesin (kategori khusus) (menurut dokumentasi penyedia, diakses 2026-10-28) |
+| 2026-10-28T06:48:58.214Z | localhost / jaringan privat | 127.0.0.1 | /v1/chat/completions | raw | NIK: 1, TELEPON: 1, EMAIL: 1 | tidak keluar mesin (kategori khusus) (menurut dokumentasi penyedia, diakses 2026-10-28) |
+| 2026-10-28T06:48:58.233Z | localhost / jaringan privat | 127.0.0.1 | /v1/chat/completions | masked | — | tidak keluar mesin (kategori khusus) (menurut dokumentasi penyedia, diakses 2026-10-28) |
+| 2026-10-28T06:48:58.235Z | localhost / jaringan privat | 127.0.0.1 | /v1/chat/completions | clean | — | tidak keluar mesin (kategori khusus) (menurut dokumentasi penyedia, diakses 2026-10-28) |
 
 ## Luar lingkup laporan
 

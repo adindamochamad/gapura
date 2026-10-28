@@ -2,16 +2,17 @@
 
 ## 0.1.0 — 2026-10-28
 
-Scaffold awal:
+### Added
 
-- `wrapFetch`, log JSONL allowlist, observasi status lima nilai
-- CLI: `demo`, `report`, `providers`
-- Laporan Markdown + HTML (cetak A4)
-- Laporan HTML: Untitled UI (metrik, tabel, accordion Pasal 161), copy natural
-- Penampil statis `viewer/index.html` (seret/pilih `.jsonl`, tanpa upload)
-- Tes privasi, deteksi, schema, laporan, viewer (12 tes)
-- Dokumentasi PRD, DECISIONS, EVIDENCE, PASAL-161, BATASAN, ATM (Untitled UI)
+- `wrapFetch`, log JSONL allowlist, lima status panggilan, fail-open
+- Gerbang body 5 MB (`Content-Length` + stream cap)
+- CLI: `demo`, `report`, `providers`, **`proxy`**
+- Laporan Markdown + HTML (Pasal 161 a–g), penampil `viewer/index.html`
+- Tes: privasi, deteksi 11 jenis × 4 bentuk JSON, stress, proxy, body-limit (**72** tes)
+- Dokumentasi: PENYEDIA (kutipan docs), PITCH, TIRAI-README-DRAFT, Lighthouse a11y 100, screenshot
+- CI: forbidden words, secret scan, `proxy --help`
 
-**Checkpoint sesi 28 Okt ~13:32 WIB** — lihat `docs/EVIDENCE.md`.
+### Notes
 
-Belum: `git`/GitHub, proxy, verifikasi penuh tabel penyedia, DoD 15 poin lengkap.
+- **Tidak** dipublish ke npm (keputusan pemilik repo).
+- Validasi pasar 3 percakapan = tugas Adinda.

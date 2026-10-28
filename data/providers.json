@@ -5,26 +5,26 @@
     "hosts": ["api.openai.com"],
     "processing_region": "belum terverifikasi",
     "docs_url": "https://platform.openai.com/docs/guides/your-data",
-    "source_note": "Belum dibaca; URL hidup dicek 28 Okt 2026 (WIB).",
-    "verified_at": null
+    "source_note": "Docs dibaca 28 Okt 2026 (WIB): halaman Your data menjelaskan retensi/penyimpanan endpoint, bukan satu wilayah pemrosesan tunggal.",
+    "verified_at": "2026-10-28"
   },
   {
     "id": "anthropic",
     "name": "Anthropic API",
     "hosts": ["api.anthropic.com"],
-    "processing_region": "belum terverifikasi",
+    "processing_region": "global (default inference) atau US (inference_geo=us); workspace geo saat ini hanya US",
     "docs_url": "https://platform.claude.com/docs/en/build-with-claude/data-residency",
-    "source_note": "Belum dibaca; URL hidup dicek 28 Okt 2026 (WIB).",
-    "verified_at": null
+    "source_note": "Kutipan (28 Okt 2026): default inference_geo \"global\" — inference may run in any available geography; \"us\" — inference runs only in US-based infrastructure; workspace geo only \"us\".",
+    "verified_at": "2026-10-28"
   },
   {
     "id": "google-gemini",
     "name": "Google Gemini API",
     "hosts": ["generativelanguage.googleapis.com"],
-    "processing_region": "belum terverifikasi",
+    "processing_region": "fasilitas Google di berbagai negara (Paid Services)",
     "docs_url": "https://ai.google.dev/gemini-api/terms",
-    "source_note": "Belum dibaca; URL hidup dicek 28 Okt 2026 (WIB).",
-    "verified_at": null
+    "source_note": "Kutipan Paid Services (28 Okt 2026): data may be stored transiently or cached in any country in which Google or its agents maintain facilities.",
+    "verified_at": "2026-10-28"
   },
   {
     "id": "google-vertex",
@@ -32,7 +32,7 @@
     "hosts": ["*-aiplatform.googleapis.com"],
     "processing_region": "belum terverifikasi",
     "docs_url": "https://cloud.google.com/vertex-ai/generative-ai/docs/learn/data-residency",
-    "source_note": "Wilayah deployment bisa dipilih; belum dibaca.",
+    "source_note": "Wilayah deployment bisa dipilih; halaman data residency belum terbaca lengkap (timeout 28 Okt 2026).",
     "verified_at": null
   },
   {
@@ -41,7 +41,7 @@
     "hosts": ["*.openai.azure.com"],
     "processing_region": "belum terverifikasi",
     "docs_url": "https://learn.microsoft.com/azure/ai-services/openai/",
-    "source_note": "Tergantung wilayah deployment Azure; belum dibaca.",
+    "source_note": "Tergantung wilayah deployment Azure; belum diverifikasi per baris 28 Okt 2026.",
     "verified_at": null
   },
   {
@@ -50,8 +50,8 @@
     "hosts": ["api.deepseek.com"],
     "processing_region": "belum terverifikasi",
     "docs_url": "https://api-docs.deepseek.com/",
-    "source_note": "Belum dibaca.",
-    "verified_at": null
+    "source_note": "Docs API dibaca 28 Okt 2026; tidak menyatakan wilayah pemrosesan.",
+    "verified_at": "2026-10-28"
   },
   {
     "id": "local",

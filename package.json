@@ -34,6 +34,7 @@
     "test:watch": "vitest",
     "demo": "node dist/cli/main.js demo",
     "lint:forbidden": "node scripts/check-forbidden-words.mjs",
+    "lint:secrets": "node scripts/check-secrets.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

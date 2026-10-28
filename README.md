@@ -30,6 +30,8 @@ npm run demo
 
 Menulis log ke `examples/demo-logs/` dan laporan ke `examples/sample-reports/laporan-contoh.md` (+ `.html`). Penampil statis: buka `viewer/index.html` lalu pilih berkas `.jsonl` (tanpa unggah).
 
+Contoh laporan: ![desktop](docs/screenshot/laporan-desktop.png)
+
 ## wrapFetch
 
 ```ts
@@ -49,6 +51,16 @@ await fetch("https://api.openai.com/v1/chat/completions", {
 ```
 
 OpenAI SDK: `new OpenAI({ fetch: wrapFetch(globalThis.fetch, { logDir: "..." }) })` — opsi `fetch` [terverifikasi di docs openai-node](https://github.com/openai/openai-node).
+
+Anthropic SDK: `new Anthropic({ fetch: wrapFetch(globalThis.fetch, { logDir: "..." }) })` — opsi `fetch` [terverifikasi di anthropic-sdk-typescript](https://github.com/anthropics/anthropic-sdk-typescript).
+
+## Proxy (Python, curl, dll.)
+
+```bash
+npx gapura proxy --target https://api.openai.com --listen 127.0.0.1:8787
+```
+
+Arahkan base URL aplikasi ke `http://127.0.0.1:8787`. Gapura membaca body request, meneruskan respons apa adanya (streaming didukung).
 
 ## Laporan
 
