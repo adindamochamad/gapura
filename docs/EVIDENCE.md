@@ -57,7 +57,7 @@ Docs resmi dibaca 28 Okt 2026 untuk Anthropic, Gemini Paid, OpenAI (wilayah tung
 
 Workflow: `.github/workflows/ci.yml` — typecheck, 72 tes, build, demo, proxy `--help`, forbidden words, secret scan.
 
-**Run hijau:** _(diisi URL run setelah push)_
+**Run hijau:** https://github.com/adindamochamad/gapura/actions/runs/40646364496 (push `58d68fd`, 28 Okt 2026)
 
 ## Perubahan inti v0.1 (temuan audit)
 
