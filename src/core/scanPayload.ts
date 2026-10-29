@@ -8,6 +8,8 @@ import {
 
 export interface ScanBudget {
   maxMatches?: number;
+  /** Batas waktu pemindaian sinkron (ms). */
+  maxScanMs?: number;
 }
 
 export interface ScanPayloadResult {
@@ -65,6 +67,8 @@ export function scanPayloadSync(
   detect: DetectFn = defaultDetectFn,
 ): ScanPayloadResult {
   const maxMatches = budget.maxMatches ?? DEFAULT_MAX_MATCHES;
+  const maxMs = budget.maxScanMs;
+  const started = maxMs !== undefined ? Date.now() : 0;
   const pii: PiiCounts = {};
   const tokens: TokenCounts = {};
   const reasons: CoverageReason[] = [];
@@ -73,6 +77,10 @@ export function scanPayloadSync(
   try {
     for (const text of texts) {
       for (const chunk of chunkText(text)) {
+        if (maxMs !== undefined && Date.now() - started > maxMs) {
+          reasons.push("time-budget");
+          return { pii, tokens, reasons };
+        }
         const part = detect(chunk);
         matchCount += totalCount(part.pii) + totalCount(part.tokens);
         mergeMaxPii(pii, part.pii);

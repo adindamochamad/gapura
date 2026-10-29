@@ -1,9 +1,13 @@
-# Transfer ke luar negeri
+# Catatan panggilan LLM
+
+**Catatan bantu, bukan bukti kepatuhan.**
+
+Panggilan ke host lokal atau jaringan privat bukan transfer lintas batas dari sisi Gapura.
 
 **Bukan pendapat hukum.**
 
-Dibuat: 2026-10-28T06:48:58.236Z
-Periode log: 2026-10-28T06:48:58.214Z — 2026-10-28T06:48:58.235Z
+Dibuat: 2026-10-29T04:23:33.808Z
+Periode log: 2026-10-29T04:23:33.788Z — 2026-10-29T04:23:33.805Z
 Jumlah permintaan: 3
 
 Kutip Pasal 161 dari OCR legaltrans.id; belum dicocokkan ke JDIH resmi.
@@ -38,7 +42,6 @@ Kutip Pasal 161 dari OCR legaltrans.id; belum dicocokkan ke JDIH resmi.
 
 - **Label:** isi manual
 - Isi dari config; Gapura menampilkan teks itu tanpa mengecek kebenarannya.
-- Config: SCC klausul transfer (contoh)
 
 ### (d) Penilaian efektivitas instrumen
 
@@ -46,7 +49,6 @@ Kutip Pasal 161 dari OCR legaltrans.id; belum dicocokkan ke JDIH resmi.
 
 - **Label:** isi manual
 - Sama seperti (c): kolom config, tanpa penilaian dari alat ini.
-- Config: Belum dinilai
 
 ### (e) Instrumen pelengkap
 
@@ -61,7 +63,6 @@ Kutip Pasal 161 dari OCR legaltrans.id; belum dicocokkan ke JDIH resmi.
 
 - **Label:** isi manual
 - Prosedur internal: isi config, Gapura tidak memvalidasi.
-- Config: Belum ditulis
 
 ### (g) Evaluasi ulang berkala
 
@@ -69,7 +70,6 @@ Kutip Pasal 161 dari OCR legaltrans.id; belum dicocokkan ke JDIH resmi.
 
 - **Label:** sebagian
 - Rentang waktu log plus tanggal tinjau berikutnya (config). Pelaksanaan tinjauannya di luar alat ini.
-- Revisi berikutnya 2027-01-16
 
 ## Pasal 162 (2) h
 
@@ -77,11 +77,11 @@ Butir h membahas format data yang dikirim — plain text, disamarkan, atau teren
 
 ## Permintaan
 
-| Waktu | Penyedia | Host | Path | Status | PII (jenis×jumlah) | Wilayah (dok.) |
-| --- | --- | --- | --- | --- | --- | --- |
-| 2026-10-28T06:48:58.214Z | localhost / jaringan privat | 127.0.0.1 | /v1/chat/completions | raw | NIK: 1, TELEPON: 1, EMAIL: 1 | tidak keluar mesin (kategori khusus) (menurut dokumentasi penyedia, diakses 2026-10-28) |
-| 2026-10-28T06:48:58.233Z | localhost / jaringan privat | 127.0.0.1 | /v1/chat/completions | masked | — | tidak keluar mesin (kategori khusus) (menurut dokumentasi penyedia, diakses 2026-10-28) |
-| 2026-10-28T06:48:58.235Z | localhost / jaringan privat | 127.0.0.1 | /v1/chat/completions | clean | — | tidak keluar mesin (kategori khusus) (menurut dokumentasi penyedia, diakses 2026-10-28) |
+| Waktu (UTC) | Penyedia | Host | Path | Status | PII | Token | Wilayah |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29T04:23:33.788Z | OpenAI API | api.openai.com | /v1/chat/completions | raw (raw) | NIK:1, TELEPON:1, EMAIL:1 | — | belum terverifikasi — tidak ada dokumentasi penyedia |
+| 2026-10-29T04:23:33.802Z | Anthropic API | api.anthropic.com | /v1/messages | masked (masked) | — | NIK:1, TELEPON:1 | global (default inference) atau US (inference_geo=us); workspace geo saat ini hanya US — menurut dokumentasi penyedia, diakses 2026-10-28 |
+| 2026-10-29T04:23:33.805Z | OpenAI API | api.openai.com | /v1/chat/completions | clean (tidak terdeteksi, bukan jaminan) | — | — | belum terverifikasi — tidak ada dokumentasi penyedia |
 
 ## Luar lingkup laporan
 
@@ -89,7 +89,6 @@ Butir h membahas format data yang dikirim — plain text, disamarkan, atau teren
 - Lokasi proses data di lapangan (bukan yang tertulis di dokumen)
 - Akses tim dukungan dari luar negeri
 - Teks prompt dan respons API
-- Putusan soal instrumen transfer (Pasal 165)
 - Klaim sertifikasi PDP pihak ketiga
 
 Wilayah di dokumen penyedia tidak menjawab sub-prosesor, akses support dari luar negeri, atau lokasi proses yang sebenarnya.

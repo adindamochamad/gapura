@@ -96,7 +96,7 @@ export function observeHttpRequest(input: ObserveInput): ObserveOutput {
     }
   }
 
-  const scan = scanPayloadSync(scanTexts);
+  const scan = scanPayloadSync(scanTexts, { maxScanMs: 500 });
   for (const r of scan.reasons) reasons.add(r);
 
   const pii = scan.pii;
