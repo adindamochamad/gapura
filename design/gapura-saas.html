@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gapura SaaS mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gray-25: #fcfcfd; --gray-50: #f9fafb; --gray-100: #f2f4f7; --gray-200: #eaecf0;
+      --gray-300: #d0d5dd; --gray-400: #98a2b3; --gray-500: #667085; --gray-600: #475467;
+      --gray-700: #344054; --gray-900: #101828; --white: #fff;
+      --ok-50: #ecfdf3; --ok-200: #abefc6; --ok-700: #067647;
+      --bad-50: #fef3f2; --bad-200: #fecdca; --bad-700: #b42318;
+      --warn-50: #fffaeb; --warn-200: #fedf89; --warn-700: #b54708;
+      --stone: #9a3412; --radius: 8px; --radius-lg: 12px;
+      --shadow: 0 1px 2px rgba(16,24,40,.05);
+      --shadow-sm: 0 1px 3px rgba(16,24,40,.1), 0 1px 2px rgba(16,24,40,.06);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #1a1d23;
+      color: var(--gray-900);
+      font: 14px/1.45 Inter, ui-sans-serif, system-ui, sans-serif;
+    }
+    .board {
+      display: flex;
+      gap: 48px;
+      padding: 64px;
+      width: max-content;
+    }
+    .screen {
+      width: 1440px;
+      height: 900px;
+      background: var(--gray-50);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 24px 48px rgba(0,0,0,.35);
+      flex: none;
+    }
+    .caption {
+      position: absolute;
+      top: -36px;
+      left: 0;
+      color: #d0d5dd;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .02em;
+    }
+    .mark { width: 28px; height: 17px; display: block; color: var(--gray-900); }
+    .mark path { fill: currentColor; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .feat {
+      width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--gray-200);
+      background: var(--gray-50); display: grid; place-items: center;
+    }
+    .brand strong { display: block; font-size: 14px; }
+    .brand span { display: block; font-size: 12px; color: var(--gray-500); font-weight: 400; }
+    .shell { display: flex; height: 100%; }
+    aside {
+      width: 240px; background: var(--white); border-right: 1px solid var(--gray-200);
+      padding: 20px 16px; display: flex; flex-direction: column; gap: 20px; flex: none;
+    }
+    .nav a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 8px; color: var(--gray-700); text-decoration: none; font-weight: 500;
+    }
+    .nav a.on { background: var(--gray-100); color: var(--gray-900); }
+    .nav a svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+    .aside-foot { margin-top: auto; font-size: 11px; color: var(--gray-500); line-height: 1.4; }
+    main { flex: 1; padding: 28px 32px; overflow: hidden; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 999px;
+      border: 1px solid var(--warn-200); background: var(--warn-50); color: var(--warn-700);
+    }
+    .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .st {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; border: 1px solid;
+    }
+    .st.raw { background: var(--bad-50); border-color: var(--bad-200); color: var(--bad-700); }
+    .st.masked { background: var(--ok-50); border-color: var(--ok-200); color: var(--ok-700); }
+    .st.clean { background: var(--gray-100); border-color: var(--gray-200); color: var(--gray-600); }
+    h1 { margin: 10px 0 4px; font-size: 24px; letter-spacing: -.02em; }
+    .lede { margin: 0 0 20px; color: var(--gray-500); }
+    .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .card {
+      background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg);
+      padding: 16px 18px; box-shadow: var(--shadow);
+    }
+    .card .lbl { font-size: 12px; color: var(--gray-500); font-weight: 500; }
+    .card .num { font-size: 28px; font-weight: 600; letter-spacing: -.03em; margin-top: 4px; }
+    .card .num.bad { color: var(--bad-700); }
+    .card .num.ok { color: var(--ok-700); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; color: var(--gray-500); font-weight: 500; font-size: 12px; padding: 10px 12px; border-bottom: 1px solid var(--gray-200); }
+    td { padding: 12px; border-bottom: 1px solid var(--gray-100); vertical-align: top; }
+    tr.hi td { background: var(--bad-50); }
+    .chips { display: flex; gap: 8px; margin-bottom: 14px; }
+    .chip { padding: 6px 12px; border: 1px solid var(--gray-200); border-radius: 999px; background: var(--white); font-size: 12px; font-weight: 500; color: var(--gray-700); }
+    .chip.on { background: var(--gray-900); color: var(--white); border-color: var(--gray-900); }
+    .acc { border: 1px solid var(--gray-200); border-radius: var(--radius-lg); background: var(--white); overflow: hidden; }
+    .acc + .acc { margin-top: 8px; }
+    .acc h3 { margin: 0; padding: 12px 16px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gray-100); }
+    .acc p { margin: 0; padding: 10px 16px 14px; color: var(--gray-600); font-size: 13px; }
+    .tag { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; background: var(--gray-100); color: var(--gray-700); }
+    .tag.man { background: var(--warn-50); color: var(--warn-700); }
+    .sign { display: grid; place-items: center; height: 100%; background: var(--gray-50); }
+    .sign-card { width: 420px; background: var(--white); border: 1px solid var(--gray-200); border-radius: 16px; padding: 32px; box-shadow: var(--shadow-sm); }
+    label { display: block; font-size: 13px; font-weight: 500; margin: 16px 0 6px; }
+    input, textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--gray-300); border-radius: 8px; font: inherit;
+    }
+    .btn {
+      display: inline-flex; justify-content: center; width: 100%; margin-top: 16px;
+      background: var(--stone); color: #fff; border: 0; border-radius: 8px; padding: 10px 16px;
+      font-weight: 600; font-size: 14px; cursor: default;
+    }
+    .btn.ghost { background: var(--white); color: var(--gray-700); border: 1px solid var(--gray-300); }
+    .drop {
+      border: 1.5px dashed var(--gray-300); border-radius: 16px; background: var(--white);
+      padding: 48px; text-align: center;
+    }
+    .drop h2 { margin: 8px 0 4px; font-size: 18px; }
+    pre {
+      margin: 0; background: var(--gray-25); border: 1px solid var(--gray-200); border-radius: 8px;
+      padding: 12px; font-size: 12px; overflow: hidden;
+    }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .toggle { display: flex; justify-content: space-between; align-items: center; }
+    .sw { width: 36px; height: 20px; background: var(--stone); border-radius: 999px; position: relative; }
+    .sw i { position: absolute; right: 2px; top: 2px; width: 16px; height: 16px; background: #fff; border-radius: 50%; }
+    .spark { height: 40px; margin-top: 8px; }
+    .spark svg { width: 100%; height: 40px; }
+    .host { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--gray-100); font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<div class="board">
+
+<section class="screen" id="s1">
+  <div class="caption">01 · Masuk workspace</div>
+  <div class="sign">
+    <div class="sign-card">
+      <div class="brand">
+        <div class="feat"><svg class="mark" viewBox="0 0 96 58" aria-hidden="true"><path d="M4 56 L4 28 L18 8 L38 8 L38 56 L28 56 L28 30 L14 30 L14 56 Z"/><path d="M92 56 L92 28 L78 8 L58 8 L58 56 L68 56 L68 30 L82 30 L82 56 Z"/></svg></div>
+        <div><strong>Gapura</strong><span>Mockup SaaS — fiksi</span></div>
+      </div>
+      <h1 style="font-size:22px;margin-top:24px">Masuk ke workspace</h1>
+      <p class="lede">Catatan bantu, bukan bukti kepatuhan. Bukan pendapat hukum.</p>
+      <label>Email</label>
+      <input value="tim@contoh.id" readonly />
+      <button class="btn">Masuk</button>
+      <p class="lede" style="margin-top:16px;font-size:12px">Log tetap di mesin Anda. Produk nyata Gapura adalah CLI lokal; layar ini hanya mockup.</p>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="s2">
+  <div class="caption">02 · Ringkasan</div>
+  <div class="shell">
+    <aside>
+      <div class="brand">
+        <div class="feat"><svg class="mark" viewBox="0 0 96 58" aria-hidden="true"><path d="M4 56 L4 28 L18 8 L38 8 L38 56 L28 56 L28 30 L14 30 L14 56 Z"/><path d="M92 56 L92 28 L78 8 L58 8 L58 56 L68 56 L68 30 L82 30 L82 56 Z"/></svg></div>
+        <div><strong>Gapura</strong><span>Lokal · v0.1.4</span></div>
+      </div>
+      <nav class="nav">
+        <a class="on" href="#"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg>Ringkasan</a>
+        <a href="#"><svg viewBox="0 0 16 16"><path d="M2 4h12M2 8h12M2 12h8"/></svg>Log</a>
+        <a href="#"><svg viewBox="0 0 16 16"><path d="M3 13V5l5-3 5 3v8H3z"/></svg>Laporan</a>
+        <a href="#"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 5.5v3l2 1"/></svg>Pengaturan</a>
+      </nav>
+      <p class="aside-foot">Catatan bantu, bukan bukti kepatuhan. Bukan pendapat hukum.</p>
+    </aside>
+    <main>
+      <span class="badge"><span class="dot"></span>Catatan bantu, bukan bukti kepatuhan. Bukan pendapat hukum.</span>
+      <h1>Ringkasan</h1>
+      <p class="lede">Periode log 2026-10-29T04:00:00.000Z — 3 permintaan. Host lokal bukan transfer lintas batas dari sisi Gapura.</p>
+      <div class="kpis">
+        <div class="card"><div class="lbl">Panggilan</div><div class="num">3</div></div>
+        <div class="card"><div class="lbl">raw</div><div class="num bad">1</div></div>
+        <div class="card"><div class="lbl">masked</div><div class="num ok">1</div></div>
+        <div class="card"><div class="lbl">clean</div><div class="num">1</div></div>
+      </div>
+      <div class="row2">
+        <div class="card">
+          <div class="lbl">Volume (dummy)</div>
+          <div class="spark"><svg viewBox="0 0 280 40" preserveAspectRatio="none"><polyline fill="none" stroke="#9A3412" stroke-width="2" points="0,28 40,24 80,26 120,18 160,20 200,12 240,16 280,10"/></svg></div>
+        </div>
+        <div class="card">
+          <div class="lbl">Host</div>
+          <div class="host"><span>api.openai.com</span><span>2</span></div>
+          <div class="host"><span>api.anthropic.com</span><span>1</span></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</section>
+
+<section class="screen" id="s3">
+  <div class="caption">03 · Penjelajah log</div>
+  <div class="shell">
+    <aside>
+      <div class="brand">
+        <div class="feat"><svg class="mark" viewBox="0 0 96 58" aria-hidden="true"><path d="M4 56 L4 28 L18 8 L38 8 L38 56 L28 56 L28 30 L14 30 L14 56 Z"/><path d="M92 56 L92 28 L78 8 L58 8 L58 56 L68 56 L68 30 L82 30 L82 56 Z"/></svg></div>
+        <div><strong>Gapura</strong><span>Lokal · v0.1.4</span></div>
+      </div>
+      <nav class="nav">
+        <a href="#">Ringkasan</a>
+        <a class="on" href="#">Log</a>
+        <a href="#">Laporan</a>
+        <a href="#">Pengaturan</a>
+      </nav>
+      <p class="aside-foot">Nilai PII tidak ditampilkan — hanya jenis dan jumlah.</p>
+    </aside>
+    <main>
+      <span class="badge"><span class="dot"></span>Catatan bantu, bukan bukti kepatuhan.</span>
+      <h1>Penjelajah log</h1>
+      <p class="lede">File JSONL dari folder log. Outcome: ok / timeout / network_error.</p>
+      <div class="chips">
+        <span class="chip on">Semua</span>
+        <span class="chip">raw</span>
+        <span class="chip">masked</span>
+        <span class="chip">clean</span>
+        <span class="chip">unchecked</span>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table>
+          <thead>
+            <tr>
+              <th>Waktu (UTC)</th><th>Penyedia</th><th>Path</th><th>Status</th><th>PII</th><th>Token</th><th>Outcome</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="hi">
+              <td>2026-10-29T04:00:00Z</td>
+              <td>OpenAI API<br><span style="color:var(--gray-500)">api.openai.com</span></td>
+              <td>/v1/chat/completions</td>
+              <td><span class="st raw">raw</span></td>
+              <td>NIK:1 TELEPON:1 EMAIL:1</td>
+              <td>—</td>
+              <td>ok</td>
+            </tr>
+            <tr>
+              <td>2026-10-29T04:00:00Z</td>
+              <td>Anthropic API<br><span style="color:var(--gray-500)">api.anthropic.com</span></td>
+              <td>/v1/messages</td>
+              <td><span class="st masked">masked</span></td>
+              <td>—</td>
+              <td>NIK:1 TELEPON:1</td>
+              <td>ok</td>
+            </tr>
+            <tr>
+              <td>2026-10-29T04:00:00Z</td>
+              <td>OpenAI API<br><span style="color:var(--gray-500)">api.openai.com</span></td>
+              <td>/v1/chat/completions</td>
+              <td><span class="st clean">clean</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>ok</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</section>
+
+<section class="screen" id="s4">
+  <div class="caption">04 · Laporan Pasal 161</div>
+  <div class="shell">
+    <aside>
+      <div class="brand">
+        <div class="feat"><svg class="mark" viewBox="0 0 96 58" aria-hidden="true"><path d="M4 56 L4 28 L18 8 L38 8 L38 56 L28 56 L28 30 L14 30 L14 56 Z"/><path d="M92 56 L92 28 L78 8 L58 8 L58 56 L68 56 L68 30 L82 30 L82 56 Z"/></svg></div>
+        <div><strong>Gapura</strong><span>Lokal · v0.1.4</span></div>
+      </div>
+      <nav class="nav">
+        <a href="#">Ringkasan</a>
+        <a href="#">Log</a>
+        <a class="on" href="#">Laporan</a>
+        <a href="#">Pengaturan</a>
+      </nav>
+      <p class="aside-foot">Kutip OCR legaltrans.id; belum dicocokkan ke JDIH resmi.</p>
+    </aside>
+    <main>
+      <span class="badge"><span class="dot"></span>Bukan pendapat hukum. Bukan bukti kepatuhan.</span>
+      <h1>Pasal 161 PP 33/2026</h1>
+      <p class="lede">Kolom otomatis vs isi manual. Pasal 162 (2) h: status panggilan ≠ enkripsi TLS.</p>
+      <div class="acc"><h3>(a) Perekaman dan pemetaan siklus transfer <span class="tag">sebagian</span></h3><p>Log mencatat kapan, ke penyedia mana, jenis data apa. Implikasi transfer tetap Anda yang tulis.</p></div>
+      <div class="acc"><h3>(b) Cukup, relevan, terbatas <span class="tag">sebagian</span></h3><p>Jenis, jumlah, indikasi penyamaran. Apakah sudah cukup dan relevan — bukan ranah Gapura.</p></div>
+      <div class="acc"><h3>(c) Instrumen hukum rujukan <span class="tag man">isi manual</span></h3><p>Isi dari config; Gapura menampilkan teks itu tanpa mengecek kebenarannya.</p></div>
+      <div class="acc"><h3>(d) Penilaian efektivitas instrumen <span class="tag man">isi manual</span></h3><p>Kolom config, tanpa penilaian dari alat ini.</p></div>
+      <div class="acc"><h3>(e) Instrumen pelengkap <span class="tag">sebagian</span></h3><p>Kalau request terlihat disamarkan, itu tercatat. Kontrak dan SOP — manual.</p></div>
+      <div class="acc"><h3>(f) Langkah prosedural instrumen pelengkap <span class="tag man">isi manual</span></h3><p>Prosedur internal: isi config, Gapura tidak memvalidasi.</p></div>
+      <div class="acc"><h3>(g) Evaluasi ulang berkala <span class="tag">sebagian</span></h3><p>Rentang waktu log plus tanggal tinjau berikutnya. Pelaksanaan tinjauannya di luar alat ini.</p></div>
+    </main>
+  </div>
+</section>
+
+<section class="screen" id="s5">
+  <div class="caption">05 · Pengaturan</div>
+  <div class="shell">
+    <aside>
+      <div class="brand">
+        <div class="feat"><svg class="mark" viewBox="0 0 96 58" aria-hidden="true"><path d="M4 56 L4 28 L18 8 L38 8 L38 56 L28 56 L28 30 L14 30 L14 56 Z"/><path d="M92 56 L92 28 L78 8 L58 8 L58 56 L68 56 L68 30 L82 30 L82 56 Z"/></svg></div>
+        <div><strong>Gapura</strong><span>Lokal · v0.1.4</span></div>
+      </div>
+      <nav class="nav">
+        <a href="#">Ringkasan</a>
+        <a href="#">Log</a>
+        <a href="#">Laporan</a>
+        <a class="on" href="#">Pengaturan</a>
+      </nav>
+      <p class="aside-foot">Proxy beta: loopback saja.</p>
+    </aside>
+    <main>
+      <span class="badge"><span class="dot"></span>Semua jalan di komputer Anda.</span>
+      <h1>Pengaturan</h1>
+      <p class="lede">Cermin opsi CLI. Mockup ini tidak menulis berkas.</p>
+      <div class="row2">
+        <div class="card">
+          <div class="lbl">Folder log</div>
+          <input style="margin-top:8px" value=".gapura/logs" readonly />
+        </div>
+        <div class="card">
+          <div class="lbl">Proxy loopback</div>
+          <input style="margin-top:8px" value="127.0.0.1:8787 → api.openai.com" readonly />
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="lbl">wrapFetch</div>
+        <pre style="margin-top:8px">import { wrapFetch } from "gapura/wrap";
+const fetch = wrapFetch(globalThis.fetch, {
+  logDir: defaultLogDir(),
+  label: "Aplikasi Contoh",
+});</pre>
+      </div>
+      <div class="card toggle" style="margin-top:16px">
+        <div>
+          <div class="lbl">Demo deterministik</div>
+          <div style="font-size:13px;color:var(--gray-600)">Setara <code>--deterministic</code></div>
+        </div>
+        <div class="sw"><i></i></div>
+      </div>
+    </main>
+  </div>
+</section>
+
+<section class="screen" id="s6">
+  <div class="caption">06 · Kosong / pertama kali</div>
+  <div class="shell">
+    <aside>
+      <div class="brand">
+        <div class="feat"><svg class="mark" viewBox="0 0 96 58" aria-hidden="true"><path d="M4 56 L4 28 L18 8 L38 8 L38 56 L28 56 L28 30 L14 30 L14 56 Z"/><path d="M92 56 L92 28 L78 8 L58 8 L58 56 L68 56 L68 30 L82 30 L82 56 Z"/></svg></div>
+        <div><strong>Gapura</strong><span>Lokal · v0.1.4</span></div>
+      </div>
+      <nav class="nav">
+        <a href="#">Ringkasan</a>
+        <a class="on" href="#">Log</a>
+        <a href="#">Laporan</a>
+        <a href="#">Pengaturan</a>
+      </nav>
+      <p class="aside-foot">Tanpa internet, tanpa kunci API.</p>
+    </aside>
+    <main>
+      <span class="badge"><span class="dot"></span>Catatan bantu, bukan bukti kepatuhan.</span>
+      <h1>Belum ada log</h1>
+      <p class="lede">Seret JSONL dari folder log, atau jalankan demo lokal.</p>
+      <div class="drop">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#667085" stroke-width="1.75"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M8 13h8M8 17h5"/></svg>
+        <h2>Log JSONL</h2>
+        <p class="lede">Seret file ke sini, atau klik Pilih berkas.</p>
+        <button class="btn" style="width:auto;padding:8px 16px">Pilih berkas</button>
+      </div>
+      <button class="btn ghost" style="width:auto;margin-top:16px">npm run demo</button>
+    </main>
+  </div>
+</section>
+
+</div>
+<script>
+  const q = new URLSearchParams(location.search).get("s");
+  if (q) {
+    document.body.style.background = "#f9fafb";
+    document.querySelectorAll(".screen").forEach((el, i) => {
+      el.style.display = String(i + 1) === q ? "block" : "none";
+    });
+    const board = document.querySelector(".board");
+    board.style.padding = "0";
+    board.style.gap = "0";
+    document.querySelectorAll(".caption").forEach((c) => { c.style.display = "none"; });
+  }
+</script>
+</body>
+</html>

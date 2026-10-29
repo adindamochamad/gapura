@@ -1,0 +1,422 @@
+{
+  "version": "2.21",
+  "variables": {
+    "bg": { "type": "color", "value": "#F9FAFB" },
+    "surface": { "type": "color", "value": "#FFFFFF" },
+    "ink": { "type": "color", "value": "#101828" },
+    "muted": { "type": "color", "value": "#667085" },
+    "border": { "type": "color", "value": "#EAECF0" },
+    "stone": { "type": "color", "value": "#9A3412" },
+    "raw": { "type": "color", "value": "#B42318" },
+    "masked": { "type": "color", "value": "#067647" },
+    "warn": { "type": "color", "value": "#B54708" },
+    "rawBg": { "type": "color", "value": "#FEF3F2" },
+    "okBg": { "type": "color", "value": "#ECFDF3" },
+    "warnBg": { "type": "color", "value": "#FFFAEB" }
+  },
+  "children": [
+    {
+      "id": "candi-mark",
+      "name": "Candi bentar",
+      "type": "frame",
+      "reusable": true,
+      "width": 22,
+      "height": 13,
+      "clip": true,
+      "children": [
+        {
+          "id": "candi-path",
+          "type": "path",
+          "width": 22,
+          "height": 13,
+          "fill": "$ink",
+          "viewBox": [0, 0, 96, 58],
+          "geometry": "M4 56 L4 28 L18 8 L38 8 L38 56 L28 56 L28 30 L14 30 L14 56 Z M92 56 L92 28 L78 8 L58 8 L58 56 L68 56 L68 30 L82 30 L82 56 Z"
+        }
+      ]
+    },
+    {
+      "id": "app-shell",
+      "name": "App shell",
+      "type": "frame",
+      "reusable": true,
+      "width": 1440,
+      "height": 900,
+      "layout": "horizontal",
+      "fill": "$bg",
+      "clip": true,
+      "children": [
+        {
+          "id": "sidebar",
+          "type": "frame",
+          "width": 240,
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": 20,
+          "fill": "$surface",
+          "stroke": "$border",
+          "strokeWidth": { "right": 1 },
+          "children": [
+            {
+              "id": "side-brand",
+              "type": "frame",
+              "layout": "horizontal",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "side-feat",
+                  "type": "frame",
+                  "width": 36,
+                  "height": 36,
+                  "cornerRadius": 10,
+                  "fill": "$bg",
+                  "stroke": "$border",
+                  "strokeWidth": 1,
+                  "layout": "horizontal",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [{ "id": "side-mark", "type": "ref", "ref": "candi-mark" }]
+                },
+                {
+                  "id": "side-titles",
+                  "type": "frame",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    { "id": "side-name", "type": "text", "content": "Gapura", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "600", "fill": "$ink" },
+                    { "id": "side-sub", "type": "text", "content": "Lokal · v0.1.4", "fontFamily": "Inter", "fontSize": 12, "fill": "$muted" }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "side-nav",
+              "type": "frame",
+              "layout": "vertical",
+              "gap": 4,
+              "width": "fill_container",
+              "children": [
+                { "id": "nav-ringkasan", "type": "text", "content": "Ringkasan", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "500", "fill": "$ink" },
+                { "id": "nav-log", "type": "text", "content": "Log", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "500", "fill": "$muted" },
+                { "id": "nav-laporan", "type": "text", "content": "Laporan", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "500", "fill": "$muted" },
+                { "id": "nav-set", "type": "text", "content": "Pengaturan", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "500", "fill": "$muted" }
+              ]
+            },
+            {
+              "id": "side-disclaimer",
+              "type": "text",
+              "content": "Catatan bantu, bukan bukti kepatuhan. Bukan pendapat hukum.",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fill": "$muted",
+              "width": 200,
+              "textGrowth": "fixed-width"
+            }
+          ]
+        },
+        {
+          "id": "main",
+          "type": "frame",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [28, 32, 28, 32],
+          "slot": false
+        }
+      ]
+    },
+    {
+      "id": "frame-masuk",
+      "name": "01 Masuk workspace",
+      "type": "frame",
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900,
+      "fill": "$bg",
+      "layout": "vertical",
+      "justifyContent": "center",
+      "alignItems": "center",
+      "clip": true,
+      "children": [
+        {
+          "id": "signin-card",
+          "type": "frame",
+          "width": 420,
+          "layout": "vertical",
+          "gap": 12,
+          "padding": 32,
+          "cornerRadius": 16,
+          "fill": "$surface",
+          "stroke": "$border",
+          "strokeWidth": 1,
+          "effect": { "type": "shadow", "shadowType": "outer", "offset": { "x": 0, "y": 1 }, "blur": 3, "color": "#1018281A" },
+          "children": [
+            {
+              "id": "signin-brand",
+              "type": "frame",
+              "layout": "horizontal",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "signin-feat",
+                  "type": "frame",
+                  "width": 36,
+                  "height": 36,
+                  "cornerRadius": 10,
+                  "fill": "$bg",
+                  "stroke": "$border",
+                  "strokeWidth": 1,
+                  "layout": "horizontal",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [{ "id": "signin-mark", "type": "ref", "ref": "candi-mark" }]
+                },
+                { "id": "signin-name", "type": "text", "content": "Gapura", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "600", "fill": "$ink" }
+              ]
+            },
+            { "id": "signin-h1", "type": "text", "content": "Masuk ke workspace", "fontFamily": "Inter", "fontSize": 22, "fontWeight": "600", "fill": "$ink" },
+            { "id": "signin-lede", "type": "text", "content": "Catatan bantu, bukan bukti kepatuhan. Bukan pendapat hukum.", "fontFamily": "Inter", "fontSize": 13, "fill": "$muted", "width": 356, "textGrowth": "fixed-width" },
+            { "id": "signin-label", "type": "text", "content": "Email", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "500", "fill": "$ink" },
+            {
+              "id": "signin-input",
+              "type": "frame",
+              "width": "fill_container",
+              "height": 40,
+              "cornerRadius": 8,
+              "stroke": "#D0D5DD",
+              "strokeWidth": 1,
+              "padding": [10, 12],
+              "children": [{ "id": "signin-email", "type": "text", "content": "tim@contoh.id", "fontFamily": "Inter", "fontSize": 14, "fill": "$ink" }]
+            },
+            {
+              "id": "signin-btn",
+              "type": "frame",
+              "width": "fill_container",
+              "height": 40,
+              "cornerRadius": 8,
+              "fill": "$stone",
+              "layout": "horizontal",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [{ "id": "signin-btn-label", "type": "text", "content": "Masuk", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "600", "fill": "#FFFFFF" }]
+            },
+            { "id": "signin-foot", "type": "text", "content": "Log tetap di mesin Anda. Produk nyata adalah CLI lokal; layar ini mockup fiksi.", "fontFamily": "Inter", "fontSize": 12, "fill": "$muted", "width": 356, "textGrowth": "fixed-width" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "frame-ringkasan",
+      "name": "02 Ringkasan",
+      "type": "ref",
+      "ref": "app-shell",
+      "x": 1488,
+      "y": 0,
+      "descendants": {
+        "nav-ringkasan": { "fontWeight": "600", "fill": "$ink" },
+        "main": {
+          "children": [
+            { "id": "r-badge", "type": "text", "content": "Catatan bantu, bukan bukti kepatuhan. Bukan pendapat hukum.", "fontFamily": "Inter", "fontSize": 12, "fill": "$warn" },
+            { "id": "r-h1", "type": "text", "content": "Ringkasan", "fontFamily": "Inter", "fontSize": 24, "fontWeight": "600", "fill": "$ink" },
+            { "id": "r-lede", "type": "text", "content": "Periode 2026-10-29T04:00:00.000Z — 3 permintaan.", "fontFamily": "Inter", "fontSize": 14, "fill": "$muted" },
+            {
+              "id": "r-kpis",
+              "type": "frame",
+              "layout": "horizontal",
+              "gap": 16,
+              "width": "fill_container",
+              "children": [
+                { "id": "kpi1", "type": "frame", "width": "fill_container", "layout": "vertical", "gap": 4, "padding": 16, "cornerRadius": 12, "fill": "$surface", "stroke": "$border", "strokeWidth": 1, "children": [
+                  { "id": "kpi1l", "type": "text", "content": "Panggilan", "fontFamily": "Inter", "fontSize": 12, "fill": "$muted" },
+                  { "id": "kpi1n", "type": "text", "content": "3", "fontFamily": "Inter", "fontSize": 28, "fontWeight": "600", "fill": "$ink" }
+                ]},
+                { "id": "kpi2", "type": "frame", "width": "fill_container", "layout": "vertical", "gap": 4, "padding": 16, "cornerRadius": 12, "fill": "$surface", "stroke": "$border", "strokeWidth": 1, "children": [
+                  { "id": "kpi2l", "type": "text", "content": "raw", "fontFamily": "Inter", "fontSize": 12, "fill": "$muted" },
+                  { "id": "kpi2n", "type": "text", "content": "1", "fontFamily": "Inter", "fontSize": 28, "fontWeight": "600", "fill": "$raw" }
+                ]},
+                { "id": "kpi3", "type": "frame", "width": "fill_container", "layout": "vertical", "gap": 4, "padding": 16, "cornerRadius": 12, "fill": "$surface", "stroke": "$border", "strokeWidth": 1, "children": [
+                  { "id": "kpi3l", "type": "text", "content": "masked", "fontFamily": "Inter", "fontSize": 12, "fill": "$muted" },
+                  { "id": "kpi3n", "type": "text", "content": "1", "fontFamily": "Inter", "fontSize": 28, "fontWeight": "600", "fill": "$masked" }
+                ]},
+                { "id": "kpi4", "type": "frame", "width": "fill_container", "layout": "vertical", "gap": 4, "padding": 16, "cornerRadius": 12, "fill": "$surface", "stroke": "$border", "strokeWidth": 1, "children": [
+                  { "id": "kpi4l", "type": "text", "content": "clean", "fontFamily": "Inter", "fontSize": 12, "fill": "$muted" },
+                  { "id": "kpi4n", "type": "text", "content": "1", "fontFamily": "Inter", "fontSize": 28, "fontWeight": "600", "fill": "$ink" }
+                ]}
+              ]
+            },
+            {
+              "id": "r-hosts",
+              "type": "frame",
+              "layout": "vertical",
+              "gap": 8,
+              "padding": 16,
+              "cornerRadius": 12,
+              "fill": "$surface",
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "width": "fill_container",
+              "children": [
+                { "id": "host-h", "type": "text", "content": "Host", "fontFamily": "Inter", "fontSize": 12, "fill": "$muted" },
+                { "id": "host-oai", "type": "text", "content": "api.openai.com    2", "fontFamily": "Inter", "fontSize": 13, "fill": "$ink" },
+                { "id": "host-ant", "type": "text", "content": "api.anthropic.com    1", "fontFamily": "Inter", "fontSize": 13, "fill": "$ink" }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "frame-log",
+      "name": "03 Penjelajah log",
+      "type": "ref",
+      "ref": "app-shell",
+      "x": 2976,
+      "y": 0,
+      "descendants": {
+        "nav-ringkasan": { "fill": "$muted", "fontWeight": "500" },
+        "nav-log": { "fill": "$ink", "fontWeight": "600" },
+        "main": {
+          "children": [
+            { "id": "l-badge", "type": "text", "content": "Catatan bantu, bukan bukti kepatuhan.", "fontFamily": "Inter", "fontSize": 12, "fill": "$warn" },
+            { "id": "l-h1", "type": "text", "content": "Penjelajah log", "fontFamily": "Inter", "fontSize": 24, "fontWeight": "600", "fill": "$ink" },
+            { "id": "l-lede", "type": "text", "content": "JSONL dari folder log. Baris raw disorot.", "fontFamily": "Inter", "fontSize": 14, "fill": "$muted" },
+            {
+              "id": "l-chips",
+              "type": "frame",
+              "layout": "horizontal",
+              "gap": 8,
+              "children": [
+                { "id": "chip-all", "type": "frame", "padding": [6, 12], "cornerRadius": 999, "fill": "$ink", "children": [{ "id": "chip-all-t", "type": "text", "content": "Semua", "fontFamily": "Inter", "fontSize": 12, "fontWeight": "500", "fill": "#FFFFFF" }] },
+                { "id": "chip-raw", "type": "frame", "padding": [6, 12], "cornerRadius": 999, "stroke": "$border", "strokeWidth": 1, "fill": "$surface", "children": [{ "id": "chip-raw-t", "type": "text", "content": "raw", "fontFamily": "Inter", "fontSize": 12, "fill": "$ink" }] },
+                { "id": "chip-mask", "type": "frame", "padding": [6, 12], "cornerRadius": 999, "stroke": "$border", "strokeWidth": 1, "fill": "$surface", "children": [{ "id": "chip-mask-t", "type": "text", "content": "masked", "fontFamily": "Inter", "fontSize": 12, "fill": "$ink" }] }
+              ]
+            },
+            {
+              "id": "l-table",
+              "type": "frame",
+              "layout": "vertical",
+              "width": "fill_container",
+              "cornerRadius": 12,
+              "fill": "$surface",
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "clip": true,
+              "children": [
+                { "id": "th", "type": "text", "content": "Waktu · Penyedia · Path · Status · PII · Token · Outcome", "fontFamily": "Inter", "fontSize": 12, "fill": "$muted", "padding": 12 },
+                {
+                  "id": "row-raw",
+                  "type": "frame",
+                  "layout": "vertical",
+                  "padding": 12,
+                  "fill": "$rawBg",
+                  "width": "fill_container",
+                  "children": [
+                    { "id": "row-raw-t", "type": "text", "content": "2026-10-29T04:00:00Z  OpenAI  /v1/chat/completions  raw  NIK:1 TELEPON:1 EMAIL:1  —  ok", "fontFamily": "Inter", "fontSize": 13, "fill": "$ink", "width": 1100, "textGrowth": "fixed-width" }
+                  ]
+                },
+                { "id": "row-mask", "type": "text", "content": "2026-10-29T04:00:00Z  Anthropic  /v1/messages  masked  —  NIK:1 TELEPON:1  ok", "fontFamily": "Inter", "fontSize": 13, "fill": "$ink", "padding": 12 },
+                { "id": "row-clean", "type": "text", "content": "2026-10-29T04:00:00Z  OpenAI  /v1/chat/completions  clean  —  —  ok", "fontFamily": "Inter", "fontSize": 13, "fill": "$ink", "padding": 12 }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "frame-pasal",
+      "name": "04 Laporan Pasal 161",
+      "type": "ref",
+      "ref": "app-shell",
+      "x": 4464,
+      "y": 0,
+      "descendants": {
+        "nav-ringkasan": { "fill": "$muted" },
+        "nav-laporan": { "fill": "$ink", "fontWeight": "600" },
+        "main": {
+          "children": [
+            { "id": "p-badge", "type": "text", "content": "Bukan pendapat hukum. Bukan bukti kepatuhan.", "fontFamily": "Inter", "fontSize": 12, "fill": "$warn" },
+            { "id": "p-h1", "type": "text", "content": "Pasal 161 PP 33/2026", "fontFamily": "Inter", "fontSize": 24, "fontWeight": "600", "fill": "$ink" },
+            { "id": "p-lede", "type": "text", "content": "Pasal 162 (2) h: status panggilan bukan enkripsi TLS.", "fontFamily": "Inter", "fontSize": 14, "fill": "$muted" },
+            { "id": "acc-a", "type": "frame", "layout": "vertical", "gap": 6, "padding": 14, "cornerRadius": 12, "fill": "$surface", "stroke": "$border", "strokeWidth": 1, "width": "fill_container", "children": [
+              { "id": "acc-a-h", "type": "text", "content": "(a) Perekaman siklus transfer    sebagian", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "600", "fill": "$ink" },
+              { "id": "acc-a-p", "type": "text", "content": "Log mencatat kapan, penyedia, jenis data. Implikasi tetap Anda yang tulis.", "fontFamily": "Inter", "fontSize": 13, "fill": "$muted", "width": 1100, "textGrowth": "fixed-width" }
+            ]},
+            { "id": "acc-c", "type": "frame", "layout": "vertical", "gap": 6, "padding": 14, "cornerRadius": 12, "fill": "$surface", "stroke": "$border", "strokeWidth": 1, "width": "fill_container", "children": [
+              { "id": "acc-c-h", "type": "text", "content": "(c) Instrumen hukum rujukan    isi manual", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "600", "fill": "$ink" },
+              { "id": "acc-c-p", "type": "text", "content": "Isi dari config; Gapura menampilkan tanpa mengecek kebenaran.", "fontFamily": "Inter", "fontSize": 13, "fill": "$muted", "width": 1100, "textGrowth": "fixed-width" }
+            ]},
+            { "id": "acc-e", "type": "frame", "layout": "vertical", "gap": 6, "padding": 14, "cornerRadius": 12, "fill": "$surface", "stroke": "$border", "strokeWidth": 1, "width": "fill_container", "children": [
+              { "id": "acc-e-h", "type": "text", "content": "(e) Instrumen pelengkap    sebagian", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "600", "fill": "$ink" },
+              { "id": "acc-e-p", "type": "text", "content": "Penyamaran tercatat. Kontrak dan SOP — manual.", "fontFamily": "Inter", "fontSize": 13, "fill": "$muted", "width": 1100, "textGrowth": "fixed-width" }
+            ]}
+          ]
+        }
+      }
+    },
+    {
+      "id": "frame-set",
+      "name": "05 Pengaturan",
+      "type": "ref",
+      "ref": "app-shell",
+      "x": 5952,
+      "y": 0,
+      "descendants": {
+        "nav-ringkasan": { "fill": "$muted" },
+        "nav-set": { "fill": "$ink", "fontWeight": "600" },
+        "main": {
+          "children": [
+            { "id": "s-badge", "type": "text", "content": "Semua jalan di komputer Anda.", "fontFamily": "Inter", "fontSize": 12, "fill": "$warn" },
+            { "id": "s-h1", "type": "text", "content": "Pengaturan", "fontFamily": "Inter", "fontSize": 24, "fontWeight": "600", "fill": "$ink" },
+            { "id": "s-path", "type": "text", "content": "Folder log: .gapura/logs", "fontFamily": "Inter", "fontSize": 14, "fill": "$ink" },
+            { "id": "s-proxy", "type": "text", "content": "Proxy loopback: 127.0.0.1:8787 → api.openai.com (beta, jangan di jaringan bersama)", "fontFamily": "Inter", "fontSize": 14, "fill": "$ink" },
+            { "id": "s-code", "type": "text", "content": "wrapFetch(globalThis.fetch, { logDir, label: \"Aplikasi Contoh\" })", "fontFamily": "Inter", "fontSize": 13, "fill": "$muted" },
+            { "id": "s-det", "type": "text", "content": "Demo deterministik  —  setara --deterministic  [nyala]", "fontFamily": "Inter", "fontSize": 14, "fill": "$ink" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "frame-empty",
+      "name": "06 Kosong pertama kali",
+      "type": "ref",
+      "ref": "app-shell",
+      "x": 7440,
+      "y": 0,
+      "descendants": {
+        "nav-ringkasan": { "fill": "$muted" },
+        "nav-log": { "fill": "$ink", "fontWeight": "600" },
+        "main": {
+          "children": [
+            { "id": "e-badge", "type": "text", "content": "Catatan bantu, bukan bukti kepatuhan.", "fontFamily": "Inter", "fontSize": 12, "fill": "$warn" },
+            { "id": "e-h1", "type": "text", "content": "Belum ada log", "fontFamily": "Inter", "fontSize": 24, "fontWeight": "600", "fill": "$ink" },
+            { "id": "e-lede", "type": "text", "content": "Seret JSONL dari folder log, atau jalankan demo lokal.", "fontFamily": "Inter", "fontSize": 14, "fill": "$muted" },
+            {
+              "id": "e-drop",
+              "type": "frame",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "padding": 48,
+              "cornerRadius": 16,
+              "fill": "$surface",
+              "stroke": "#D0D5DD",
+              "strokeWidth": 1,
+              "alignItems": "center",
+              "children": [
+                { "id": "e-drop-h", "type": "text", "content": "Log JSONL", "fontFamily": "Inter", "fontSize": 18, "fontWeight": "600", "fill": "$ink" },
+                { "id": "e-drop-p", "type": "text", "content": "Seret file ke sini, atau klik Pilih berkas.", "fontFamily": "Inter", "fontSize": 13, "fill": "$muted" },
+                { "id": "e-drop-btn", "type": "frame", "padding": [8, 16], "cornerRadius": 8, "fill": "$stone", "children": [{ "id": "e-drop-bt", "type": "text", "content": "Pilih berkas", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "600", "fill": "#FFFFFF" }] }
+              ]
+            },
+            { "id": "e-demo", "type": "text", "content": "npm run demo", "fontFamily": "Inter", "fontSize": 14, "fontWeight": "500", "fill": "$ink" }
+          ]
+        }
+      }
+    }
+  ]
+}

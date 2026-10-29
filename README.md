@@ -67,6 +67,10 @@ node dist/cli/main.js proxy --target https://api.openai.com --listen 127.0.0.1:8
 node dist/cli/main.js report --log ./.gapura/logs --out ./.gapura/reports
 ```
 
+## Mockup pitch (fiksi SaaS)
+
+Prototipe statis untuk slide/demo — **bukan** aplikasi cloud Gapura: [`examples/saas-mockup/index.html`](examples/saas-mockup/index.html) (buka di browser). Desain pen.dev dan review: [`design/`](design/).
+
 ## Batasan
 
 Lihat [docs/BATASAN.md](docs/BATASAN.md).

@@ -33,6 +33,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "demo": "node dist/cli/main.js demo --out ./gapura-demo-out",
+    "mockup": "node scripts/open-mockup.mjs",
+    "mockup:check": "node scripts/mockup-check.mjs",
     "examples:update": "npm run build && node scripts/examples-update.mjs",
     "examples:check": "npm run build && node scripts/examples-check.mjs",
     "mutation:patterns": "node scripts/mutation-check.mjs --patterns-only",
