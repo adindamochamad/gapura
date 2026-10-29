@@ -1,13 +1,16 @@
 import {
   createServer,
+  request as httpRequest,
   type IncomingMessage,
   type Server,
   type ServerResponse,
 } from "node:http";
-import type { GapuraConfig } from "../core/types.js";
+import { request as httpsRequest } from "node:https";
+import { pipeline } from "node:stream/promises";
+import type { GapuraConfig, LogOutcome } from "../core/types.js";
 import { observeHttpRequest } from "../core/observe.js";
 import { appendLogEntry, type LoggerOptions } from "../core/logger.js";
-import { bufferIncomingMessageBody } from "./body.js";
+import { createRequestBodyBridge, parseClientRequestPath } from "./body.js";
 
 const HOP_BY_HOP = new Set([
   "connection",
@@ -29,6 +32,7 @@ export interface ProxyServerOptions {
   config?: GapuraConfig;
   label?: string;
   strictSchema?: boolean;
+  timeoutMs?: number;
   onError?: (err: unknown) => void;
 }
 
@@ -38,121 +42,206 @@ export interface ProxyServerHandle {
   close: () => Promise<void>;
 }
 
-function buildTargetUrl(
-  targetOrigin: string,
-  req: IncomingMessage,
-): string {
-  const base = new URL(targetOrigin);
-  const path = req.url ?? "/";
-  return new URL(path, base).toString();
+function sendText(res: ServerResponse, code: number, msg: string): void {
+  if (res.headersSent) return;
+  res.statusCode = code;
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  res.end(msg);
 }
 
-function forwardRequestHeaders(
-  req: IncomingMessage,
-  targetUrl: URL,
-): Headers {
-  const out = new Headers();
-  for (const [key, value] of Object.entries(req.headers)) {
-    if (value === undefined) continue;
-    const lower = key.toLowerCase();
-    if (HOP_BY_HOP.has(lower)) continue;
-    if (Array.isArray(value)) {
-      for (const v of value) out.append(key, v);
-    } else {
-      out.set(key, value);
-    }
-  }
-  out.set("host", targetUrl.host);
-  return out;
+function allowedHostHeader(
+  hostHeader: string | undefined,
+  listenHost: string,
+  listenPort: number,
+): boolean {
+  if (!hostHeader) return true;
+  const allowed = new Set([
+    `${listenHost}:${listenPort}`,
+    `127.0.0.1:${listenPort}`,
+    `localhost:${listenPort}`,
+    `[::1]:${listenPort}`,
+  ]);
+  return allowed.has(hostHeader.toLowerCase());
+}
+
+function buildUpstreamUrl(
+  target: URL,
+  pathname: string,
+  search: string,
+): string {
+  return `${target.origin}${pathname}${search}`;
 }
 
 export function startGapuraProxy(
   options: ProxyServerOptions,
 ): Promise<ProxyServerHandle> {
-  const targetOrigin = options.targetOrigin.replace(/\/$/, "");
+  const target = new URL(options.targetOrigin.replace(/\/$/, "") + "/");
   const logOpts: LoggerOptions = {
     logDir: options.logDir,
     strictSchema: options.strictSchema,
   };
+  const timeoutMs = options.timeoutMs ?? 60_000;
 
   return new Promise((resolve, reject) => {
-    const server: Server = createServer(
-      async (req: IncomingMessage, res: ServerResponse) => {
-        const targetUrl = new URL(buildTargetUrl(targetOrigin, req));
-        let forwardBody: Buffer = Buffer.alloc(0);
-        try {
-          const buffered = await bufferIncomingMessageBody(req);
-          forwardBody = buffered.forwardBody;
-          const headerPairs: [string, string][] = [];
-          for (const [k, v] of Object.entries(req.headers)) {
-            if (v === undefined) continue;
-            if (Array.isArray(v)) {
-              for (const x of v) headerPairs.push([k, x]);
-            } else {
-              headerPairs.push([k, v]);
-            }
-          }
-          const { entry } = observeHttpRequest({
-            url: targetUrl.toString(),
-            method: req.method ?? "GET",
-            headers: new Headers(headerPairs),
-            bodyText: buffered.bodyText,
-            bodyBytes: buffered.bodyBytes,
-            label: options.label ?? options.config?.label,
-            config: options.config,
-          });
-          appendLogEntry(entry, logOpts);
-        } catch (err) {
-          if (options.onError) options.onError(err);
-          else console.error("gapura: observation failed");
+    const server: Server = createServer(async (req, res) => {
+      try {
+        if (req.method === "CONNECT") {
+          sendText(res, 501, "CONNECT not supported");
+          return;
+        }
+        const rawUrl = req.url ?? "/";
+        if (rawUrl.length > 8192) {
+          sendText(res, 414, "URI Too Long");
+          return;
+        }
+        if (req.headers.origin) {
+          sendText(res, 403, "Forbidden");
+          return;
+        }
+        const listenPort =
+          typeof server.address() === "object" && server.address()
+            ? (server.address() as { port: number }).port
+            : options.listenPort;
+        if (
+          !allowedHostHeader(
+            req.headers.host,
+            options.listenHost,
+            listenPort,
+          )
+        ) {
+          sendText(res, 400, "Bad Request");
+          return;
         }
 
-        try {
-          const method = req.method ?? "GET";
-          const headers = forwardRequestHeaders(req, targetUrl);
-          const hasBody =
-            method !== "GET" &&
-            method !== "HEAD" &&
-            forwardBody.byteLength > 0;
-          const upstream = await fetch(targetUrl.toString(), {
-            method,
-            headers,
-            body: hasBody ? forwardBody : undefined,
-          });
+        const parsed = parseClientRequestPath(rawUrl);
+        if (!parsed) {
+          sendText(res, 400, "Bad Request");
+          return;
+        }
 
-          res.statusCode = upstream.status;
-          upstream.headers.forEach((value, key) => {
-            if (HOP_BY_HOP.has(key.toLowerCase())) return;
-            res.setHeader(key, value);
-          });
+        const upstreamUrl = new URL(
+          buildUpstreamUrl(target, parsed.pathname, parsed.search),
+        );
+        if (upstreamUrl.origin !== target.origin) {
+          sendText(res, 400, "Bad Request");
+          return;
+        }
 
-          if (!upstream.body) {
-            res.end();
-            return;
-          }
+        const method = req.method ?? "GET";
+        const bridge =
+          method === "GET" || method === "HEAD"
+            ? null
+            : createRequestBodyBridge(req);
 
-          const reader = upstream.body.getReader();
+        const headers: Record<string, string | string[]> = {};
+        for (const [key, value] of Object.entries(req.headers)) {
+          if (value === undefined) continue;
+          const lower = key.toLowerCase();
+          if (HOP_BY_HOP.has(lower)) continue;
+          headers[key] = value;
+        }
+        headers.host = upstreamUrl.host;
+
+        const transport = upstreamUrl.protocol === "https:" ? httpsRequest : httpRequest;
+        const upstreamReq = transport(upstreamUrl, {
+          method,
+          headers,
+          timeout: timeoutMs,
+        });
+
+        let outcome: LogOutcome = "network_error";
+        let http_status: number | undefined;
+        let logged = false;
+
+        const logResult = async () => {
+          if (logged) return;
+          logged = true;
           try {
-            for (;;) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              if (value?.byteLength) res.write(Buffer.from(value));
+            const bodyInfo = bridge
+              ? await bridge.finished
+              : { bodyBytes: 0, bodyText: "", extraReasons: [] as const };
+            const headerPairs: [string, string][] = [];
+            for (const [k, v] of Object.entries(req.headers)) {
+              if (v === undefined) continue;
+              if (Array.isArray(v)) for (const x of v) headerPairs.push([k, x]);
+              else headerPairs.push([k, v]);
             }
-          } finally {
-            res.end();
+            const { entry } = observeHttpRequest({
+              url: upstreamUrl.toString(),
+              method,
+              headers: new Headers(headerPairs),
+              bodyText: bodyInfo.bodyText,
+              bodyBytes: bodyInfo.bodyBytes,
+              label: options.label ?? options.config?.label,
+              config: options.config,
+              extraReasons: [...bodyInfo.extraReasons],
+            });
+            entry.outcome = outcome;
+            if (http_status !== undefined) entry.http_status = http_status;
+            appendLogEntry(entry, logOpts);
+          } catch (err) {
+            if (options.onError) options.onError(err);
+            else console.error("gapura: observation failed");
           }
-        } catch (err) {
-          if (!res.headersSent) {
-            res.statusCode = 502;
-            res.setHeader("Content-Type", "text/plain; charset=utf-8");
-            res.end("gapura proxy: upstream error");
-          } else {
-            res.end();
+        };
+
+        res.on("close", () => {
+          if (!res.writableFinished) {
+            outcome = "aborted";
+            upstreamReq.destroy();
+            void logResult();
           }
-          if (options.onError) options.onError(err);
+        });
+
+        upstreamReq.on("response", (upstreamRes) => {
+          http_status = upstreamRes.statusCode ?? 502;
+          outcome =
+            http_status >= 400 ? "http_error" : http_status >= 300 ? "ok" : "ok";
+          if (http_status >= 400) outcome = "http_error";
+          else outcome = "ok";
+
+          res.statusCode = http_status;
+          for (const [key, value] of Object.entries(upstreamRes.headers)) {
+            if (value === undefined) continue;
+            const lower = key.toLowerCase();
+            if (HOP_BY_HOP.has(lower)) continue;
+            if (Array.isArray(value)) res.setHeader(key, value);
+            else res.setHeader(key, value);
+          }
+
+          void (async () => {
+            try {
+              await pipeline(upstreamRes, res);
+              await logResult();
+            } catch (err) {
+              if (options.onError) options.onError(err);
+              if (!res.headersSent) sendText(res, 502, "Bad Gateway");
+            }
+          })();
+        });
+
+        upstreamReq.on("timeout", () => {
+          upstreamReq.destroy();
+          outcome = "network_error";
+          void logResult();
+          sendText(res, 504, "Gateway Timeout");
+        });
+
+        upstreamReq.on("error", () => {
+          outcome = "network_error";
+          void logResult();
+          sendText(res, 502, "Bad Gateway");
+        });
+
+        if (bridge) {
+          bridge.forward.pipe(upstreamReq);
+        } else {
+          upstreamReq.end();
         }
-      },
-    );
+      } catch {
+        sendText(res, 400, "Bad Request");
+      }
+    });
 
     server.listen(options.listenPort, options.listenHost, () => {
       const addr = server.address();
