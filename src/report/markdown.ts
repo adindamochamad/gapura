@@ -5,7 +5,7 @@ import {
   PP_SOURCE_NOTE,
 } from "./pasal161.js";
 import { buildReportSummary, providerName, type ReportSummary } from "./build.js";
-import type { GapuraConfig, LogEntryV1 } from "../core/types.js";
+import type { GapuraConfig, LogEntry } from "../core/types.js";
 
 function countsLine(counts: Partial<Record<string, number>>): string {
   const parts = Object.entries(counts)
@@ -15,10 +15,11 @@ function countsLine(counts: Partial<Record<string, number>>): string {
 }
 
 export function renderMarkdown(
-  entries: LogEntryV1[],
+  entries: LogEntry[],
   config: GapuraConfig = {},
+  corrupt_lines = 0,
 ): string {
-  const s = buildReportSummary(entries, config);
+  const s = buildReportSummary(entries, config, corrupt_lines);
   const lines: string[] = [];
 
   lines.push("# Transfer ke luar negeri");
@@ -30,6 +31,9 @@ export function renderMarkdown(
     lines.push(`Periode log: ${s.period.from} — ${s.period.to}`);
   }
   lines.push(`Jumlah permintaan: ${s.entry_count}`);
+  if (s.corrupt_lines) {
+    lines.push(`${s.corrupt_lines} baris log rusak dilewati`);
+  }
   lines.push("");
   lines.push(PP_SOURCE_NOTE);
   lines.push("");

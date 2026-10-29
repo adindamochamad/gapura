@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { CallStatus, GapuraConfig, LogEntryV1 } from "./types.js";
+import type { CallStatus, GapuraConfig, LogEntryV2 } from "./types.js";
 import { DEFAULT_MAX_BODY_BYTES as MAX_BYTES } from "./types.js";
 import {
   collectFromJson,
@@ -7,7 +7,7 @@ import {
   type JsonExtractState,
 } from "./extract.js";
 import { extractSafeModelField } from "./modelField.js";
-import { countPiiInTexts, countTiraiTokensInTexts } from "./detect.js";
+import { scanPayloadSync } from "./scanPayload.js";
 import { classifyCall } from "./classify.js";
 import { resolveProvider } from "./providers.js";
 import { sanitizePathForLog } from "./pathLog.js";
@@ -25,7 +25,7 @@ export interface ObserveInput {
 }
 
 export interface ObserveOutput {
-  entry: LogEntryV1;
+  entry: LogEntryV2;
 }
 
 function appendUrlScanTexts(url: URL, texts: string[]): void {
@@ -94,8 +94,11 @@ export function observeHttpRequest(input: ObserveInput): ObserveOutput {
     }
   }
 
-  const pii = countPiiInTexts(scanTexts);
-  const tokens = countTiraiTokensInTexts(scanTexts);
+  const scan = scanPayloadSync(scanTexts);
+  for (const r of scan.reasons) reasons.add(r);
+
+  const pii = scan.pii;
+  const tokens = scan.tokens;
   const hitTotal =
     Object.values(pii).reduce<number>((a, b) => a + (b ?? 0), 0) +
     Object.values(tokens).reduce<number>((a, b) => a + (b ?? 0), 0);
@@ -116,8 +119,8 @@ export function observeHttpRequest(input: ObserveInput): ObserveOutput {
     });
   }
 
-  const entry: LogEntryV1 = {
-    v: 1,
+  const entry: LogEntryV2 = {
+    v: 2,
     id: randomUUID(),
     ts: new Date().toISOString(),
     provider: provider.id,

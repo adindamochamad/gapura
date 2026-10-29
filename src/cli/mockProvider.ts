@@ -6,6 +6,7 @@ import { dirname, join } from "node:path";
 export interface MockProviderOptions {
   port?: number;
   host?: string;
+  status?: number;
 }
 
 export interface MockProviderHandle {
@@ -27,7 +28,7 @@ export function startMockLlmProvider(
       const chunks: Buffer[] = [];
       req.on("data", (c) => chunks.push(c));
       req.on("end", () => {
-        res.writeHead(200, { "Content-Type": "application/json" });
+        res.writeHead(options.status ?? 200, { "Content-Type": "application/json" });
         res.end(
           JSON.stringify({
             id: "mock-resp",

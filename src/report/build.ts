@@ -1,4 +1,4 @@
-import type { GapuraConfig, LogEntryV1 } from "../core/types.js";
+import type { GapuraConfig, LogEntry } from "../core/types.js";
 import { loadProviders } from "../core/providers.js";
 
 export interface ReportSummary {
@@ -8,14 +8,16 @@ export interface ReportSummary {
   by_status: Record<string, number>;
   by_provider: Record<string, number>;
   pii_totals: Record<string, number>;
-  entries: LogEntryV1[];
+  entries: LogEntry[];
   config: GapuraConfig;
   not_covered: string[];
+  corrupt_lines?: number;
 }
 
 export function buildReportSummary(
-  entries: LogEntryV1[],
+  entries: LogEntry[],
   config: GapuraConfig = {},
+  corrupt_lines = 0,
 ): ReportSummary {
   const by_status: Record<string, number> = {};
   const by_provider: Record<string, number> = {};
@@ -54,6 +56,7 @@ export function buildReportSummary(
     entries,
     config,
     not_covered,
+    corrupt_lines: corrupt_lines > 0 ? corrupt_lines : undefined,
   };
 }
 

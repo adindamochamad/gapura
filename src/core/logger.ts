@@ -6,8 +6,7 @@ import {
   readdirSync,
   readFileSync,
 } from "node:fs";
-import { dirname } from "node:path";
-import type { LogEntryV1 } from "./types.js";
+import type { LogEntry } from "./types.js";
 import {
   sanitizeSerializedLine,
   serializeLogEntry,
@@ -25,7 +24,7 @@ export function ensureLogDir(logDir: string): void {
   }
 }
 
-export function appendLogEntry(entry: LogEntryV1, options: LoggerOptions): void {
+export function appendLogEntry(entry: LogEntry, options: LoggerOptions): void {
   ensureLogDir(options.logDir);
   const cleaned = validateLogEntry(entry, {
     strictSchema: options.strictSchema ?? true,
@@ -55,16 +54,30 @@ export function defaultLogDir(cwd = process.cwd()): string {
   return `${cwd}/.gapura/logs`;
 }
 
-export function readAllLogLines(logDir: string): LogEntryV1[] {
-  if (!existsSync(logDir)) return [];
+export interface ReadLogResult {
+  entries: LogEntry[];
+  corrupt_lines: number;
+}
+
+export function readAllLogLines(logDir: string): LogEntry[] {
+  return readAllLogLinesWithStats(logDir).entries;
+}
+
+export function readAllLogLinesWithStats(logDir: string): ReadLogResult {
+  if (!existsSync(logDir)) return { entries: [], corrupt_lines: 0 };
   const files = readdirSync(logDir).filter((f) => f.endsWith(".jsonl"));
-  const entries: LogEntryV1[] = [];
+  const entries: LogEntry[] = [];
+  let corrupt_lines = 0;
   for (const file of files.sort()) {
     const content = readFileSync(`${logDir}/${file}`, "utf8");
     for (const line of content.split("\n")) {
       if (!line.trim()) continue;
-      entries.push(JSON.parse(line) as LogEntryV1);
+      try {
+        entries.push(JSON.parse(line) as LogEntry);
+      } catch {
+        corrupt_lines += 1;
+      }
     }
   }
-  return entries;
+  return { entries, corrupt_lines };
 }

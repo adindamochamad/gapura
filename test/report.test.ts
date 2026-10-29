@@ -4,8 +4,8 @@ import { renderHtml } from "../src/report/html.js";
 import { PASAL161_SECTIONS, LEGAL_DISCLAIMER } from "../src/report/pasal161.js";
 import type { LogEntryV1 } from "../src/core/types.js";
 
-const sampleEntry: LogEntryV1 = {
-  v: 1,
+const sampleEntry: LogEntry = {
+  v: 2,
   id: "1",
   ts: "2026-10-28T10:00:00.000Z",
   provider: "local",

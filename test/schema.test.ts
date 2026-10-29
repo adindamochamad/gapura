@@ -5,13 +5,13 @@ import {
   dropUnknownKeys,
 } from "../src/core/schema.js";
 import { appendLogEntry } from "../src/core/logger.js";
-import type { LogEntryV1 } from "../src/core/types.js";
+import type { LogEntryV2 } from "../src/core/types.js";
 import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const base: LogEntryV1 = {
-  v: 1,
+const base: LogEntryV2 = {
+  v: 2,
   id: "x",
   ts: "2026-10-28T00:00:00.000Z",
   provider: "local",

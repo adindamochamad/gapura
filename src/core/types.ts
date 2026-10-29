@@ -51,6 +51,26 @@ export const LOG_SCHEMA_KEYS = [
 
 export type LogSchemaKey = (typeof LOG_SCHEMA_KEYS)[number];
 
+export type LogOutcome =
+  | "ok"
+  | "http_error"
+  | "network_error"
+  | "aborted";
+
+export interface LogEntryV2 extends Omit<LogEntryV1, "v"> {
+  v: 2;
+  outcome?: LogOutcome;
+  http_status?: number;
+}
+
+export type LogEntry = LogEntryV1 | LogEntryV2;
+
+export const LOG_SCHEMA_KEYS_V2 = [
+  ...LOG_SCHEMA_KEYS,
+  "outcome",
+  "http_status",
+] as const;
+
 export interface GapuraConfig {
   log_dir?: string;
   label?: string;

@@ -64,7 +64,7 @@ function maxMergeTokens(a: TokenCounts, b: TokenCounts): TokenCounts {
   return out;
 }
 
-function countTiraiTokensPair(text: string): TokenCounts {
+export function countTiraiTokensPair(text: string): TokenCounts {
   return maxMergeTokens(
     countTiraiTokens(text),
     countTiraiTokens(normalizeForScan(text)),

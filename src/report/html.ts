@@ -5,7 +5,7 @@ import {
   PASAL162_H_NOTE,
   PP_SOURCE_NOTE,
 } from "./pasal161.js";
-import type { GapuraConfig, LogEntryV1 } from "../core/types.js";
+import type { GapuraConfig, LogEntry } from "../core/types.js";
 import { buildReportSummary, providerName } from "./build.js";
 import {
   CANDI_BENTAR_SVG,
@@ -50,10 +50,11 @@ function manualFor(id: string, config: GapuraConfig): string | undefined {
 }
 
 export function renderHtml(
-  entries: LogEntryV1[],
+  entries: LogEntry[],
   config: GapuraConfig = {},
+  corrupt_lines = 0,
 ): string {
-  const s = buildReportSummary(entries, config);
+  const s = buildReportSummary(entries, config, corrupt_lines);
   const mdFallback = renderMarkdown(entries, config);
   const statuses = ["raw", "masked", "mixed", "clean", "unchecked"] as const;
 
