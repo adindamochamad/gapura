@@ -1,6 +1,8 @@
 # Gapura
 
-Mencatat panggilan LLM yang membawa data pribadi Indonesia, lalu mencetak lampiran Pasal 161 PP 33/2026. Semua jalan di komputer Anda.
+Mencatat panggilan LLM yang membawa data pribadi Indonesia, lalu mencetak **catatan bantu** terkait Pasal 161 PP 33/2026. Semua jalan di komputer Anda.
+
+**Belum ada di npm.** Clone repo ini, `npm ci`, `npm run build`, lalu `npm pack` dan pasang tarball di proyek lain (atau `npm link`).
 
 **Bukan pendapat hukum.** Tidak terkait PT Gapura Angkasa.
 
@@ -8,7 +10,7 @@ Pasangan penyamaran: [@adindamochamad/tirai](https://github.com/adindamochamad/t
 
 ## Prasyarat
 
-- Node.js **≥ 20** (dites di 22 / 26)
+- Node.js **≥ 20** (CI: Node 20 dan 22; Windows belum diuji)
 - npm
 
 ## Instal (dari repo)
@@ -18,6 +20,9 @@ git clone https://github.com/adindamochamad/gapura.git
 cd gapura
 npm ci
 npm run build
+npm pack
+# di proyek lain:
+npm install /path/to/gapura-0.1.1.tgz
 ```
 
 ## Demo satu perintah
@@ -28,9 +33,7 @@ Tanpa internet, tanpa kunci API:
 npm run demo
 ```
 
-Menulis log ke `examples/demo-logs/` dan laporan ke `examples/sample-reports/laporan-contoh.md` (+ `.html`). Penampil statis: buka `viewer/index.html` lalu pilih berkas `.jsonl` (tanpa unggah).
-
-Contoh laporan: ![desktop](docs/screenshot/laporan-desktop.png)
+Menulis ke `./gapura-demo-out/` (log + laporan). Tidak mengubah berkas contoh di repo.
 
 ## wrapFetch
 
@@ -42,39 +45,27 @@ const fetch = wrapFetch(globalThis.fetch, {
   logDir: defaultLogDir(),
   label: "Aplikasi Contoh",
 });
-
-await fetch("https://api.openai.com/v1/chat/completions", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ model: "gpt-4o-mini", messages: [] }),
-});
 ```
 
-OpenAI SDK: `new OpenAI({ fetch: wrapFetch(globalThis.fetch, { logDir: "..." }) })` — opsi `fetch` [terverifikasi di docs openai-node](https://github.com/openai/openai-node).
+OpenAI SDK: opsi `fetch` [dibaca di docs openai-node](https://github.com/openai/openai-node), **belum diuji dengan SDK asli**.
 
-Anthropic SDK: `new Anthropic({ fetch: wrapFetch(globalThis.fetch, { logDir: "..." }) })` — opsi `fetch` [terverifikasi di anthropic-sdk-typescript](https://github.com/anthropics/anthropic-sdk-typescript).
+Anthropic SDK: opsi `fetch` [dibaca di anthropic-sdk-typescript](https://github.com/anthropics/anthropic-sdk-typescript), **belum diuji dengan SDK asli**.
 
 ## Proxy (Python, curl, dll.)
 
-**Eksperimental — jangan dijalankan di jaringan bersama.**
+**Beta, hanya loopback — jangan di jaringan bersama.**
+
+Setelah `npm run build`:
 
 ```bash
-npx gapura proxy --target https://api.openai.com --listen 127.0.0.1:8787
+node dist/cli/main.js proxy --target https://api.openai.com --listen 127.0.0.1:8787
 ```
-
-Arahkan base URL aplikasi ke `http://127.0.0.1:8787`. Gapura membaca body request, meneruskan respons apa adanya (streaming didukung).
 
 ## Laporan
 
 ```bash
-npx gapura report --log ./.gapura/logs --out ./.gapura/reports
+node dist/cli/main.js report --log ./.gapura/logs --out ./.gapura/reports
 ```
-
-PDF: buka `laporan.html` di browser → cetak (stylesheet `@media print`).
-
-## gapura.config.json
-
-Isi manual Pasal 161 c–d–f dan tanggal tinjau. Lihat `examples/gapura.config.json`.
 
 ## Batasan
 
@@ -82,4 +73,4 @@ Lihat [docs/BATASAN.md](docs/BATASAN.md).
 
 ## Lisensi
 
-MIT
+MIT — lihat [LICENSE](LICENSE).

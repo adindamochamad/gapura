@@ -1,6 +1,10 @@
 #!/usr/bin/env node
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
+
 const FORBIDDEN = [
   /\bpatuh\b/i,
+  /\bkepatuhan\b/i,
   /\bcompliant\b/i,
   /\bcomply\b/i,
   /\bsesuai PP 33/i,
@@ -8,17 +12,22 @@ const FORBIDDEN = [
   /\btersertifikasi\b/i,
   /\bterjamin\b/i,
   /\bpelopor\b/i,
+  /\bpertama\b/i,
+  /\b100%\b/,
+  /\baman\b/i,
+  /\bmenuntut\b/i,
 ];
 
-import { readFileSync, readdirSync, statSync } from "node:fs";
-import { join } from "node:path";
+const ALLOW_LINE = [
+  /bukan bukti kepatuhan/i,
+  /tidak klaim kepatuhan/i,
+  /bukan nasihat hukum/i,
+  /bukan jaminan/i,
+];
 
 const ROOT = process.cwd();
 const SCAN = ["README.md", "README.en.md", "src", "docs", "examples"];
-const SKIP_FILES = new Set([
-  "gapura-cursor-prompt.md",
-  "PRD.md",
-]);
+const SKIP_FILES = new Set(["PRD.md"]);
 
 function walk(dir, out) {
   for (const name of readdirSync(dir)) {
@@ -45,11 +54,15 @@ for (const part of SCAN) {
 
 let failed = false;
 for (const file of files) {
-  const text = readFileSync(file, "utf8");
-  for (const re of FORBIDDEN) {
-    if (re.test(text)) {
-      console.error(`${file}: matched ${re}`);
-      failed = true;
+  const lines = readFileSync(file, "utf8").split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (ALLOW_LINE.some((re) => re.test(line))) continue;
+    for (const re of FORBIDDEN) {
+      if (re.test(line)) {
+        console.error(`${file}:${i + 1}: matched ${re}`);
+        failed = true;
+      }
     }
   }
 }

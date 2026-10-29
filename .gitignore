@@ -1,6 +1,8 @@
 node_modules/
 dist/
 .gapura/
+gapura-demo-out/
+gapura-*-cursor-prompt.md
 *.log
 .env
 .env.*

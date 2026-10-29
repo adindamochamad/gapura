@@ -90,6 +90,6 @@ Butir h membahas format data yang dikirim — plain text, disamarkan, atau teren
 - Akses tim dukungan dari luar negeri
 - Teks prompt dan respons API
 - Putusan soal instrumen transfer (Pasal 165)
-- Klaim sertifikasi atau status kepatuhan
+- Klaim sertifikasi PDP pihak ketiga
 
 Wilayah di dokumen penyedia tidak menjawab sub-prosesor, akses support dari luar negeri, atau lokasi proses yang sebenarnya.

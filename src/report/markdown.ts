@@ -7,10 +7,23 @@ import {
 import { buildReportSummary, providerName, type ReportSummary } from "./build.js";
 import type { GapuraConfig, LogEntry } from "../core/types.js";
 
-function countsLine(counts: Partial<Record<string, number>>): string {
+function statusNote(entry: import("../core/types.js").LogEntry): string {
+  if (entry.status === "clean") {
+    return "tidak terdeteksi, bukan jaminan";
+  }
+  if (entry.status === "unchecked" && entry.reasons?.length) {
+    return `unchecked: ${entry.reasons.join(", ")}`;
+  }
+  return entry.status;
+}
+
+function formatCounts(
+  counts: Partial<Record<string, number>>,
+  partial: boolean,
+): string {
   const parts = Object.entries(counts)
     .filter(([, v]) => (v ?? 0) > 0)
-    .map(([k, v]) => `${k}: ${v}`);
+    .map(([k, v]) => `${k}${partial ? "≥" : ""}:${v}`);
   return parts.length ? parts.join(", ") : "—";
 }
 
@@ -22,7 +35,13 @@ export function renderMarkdown(
   const s = buildReportSummary(entries, config, corrupt_lines);
   const lines: string[] = [];
 
-  lines.push("# Transfer ke luar negeri");
+  lines.push("# Catatan panggilan LLM");
+  lines.push("");
+  lines.push("**Catatan bantu, bukan bukti kepatuhan.**");
+  lines.push("");
+  lines.push(
+    "Panggilan ke host lokal atau jaringan privat bukan transfer lintas batas dari sisi Gapura.",
+  );
   lines.push("");
   lines.push(`**${LEGAL_DISCLAIMER}**`);
   lines.push("");
@@ -78,16 +97,14 @@ export function renderMarkdown(
 
   lines.push("## Permintaan");
   lines.push("");
-  lines.push("| Waktu | Penyedia | Host | Path | Status | PII (jenis×jumlah) | Wilayah (dok.) |");
-  lines.push("| --- | --- | --- | --- | --- | --- | --- |");
+  lines.push("| Waktu (UTC) | Penyedia | Host | Path | Status | PII | Token | Wilayah |");
+  lines.push("| --- | --- | --- | --- | --- | --- | --- | --- |");
   for (const e of s.entries) {
     const region = e.region_ref.processing_region;
-    const ver =
-      e.region_ref.verification === "belum terverifikasi"
-        ? "belum terverifikasi"
-        : e.region_ref.verification;
+    const ver = e.region_ref.verification;
+    const partial = e.coverage === "partial";
     lines.push(
-      `| ${e.ts} | ${providerName(e.provider)} | ${e.host} | ${e.path} | ${e.status} | ${countsLine(e.pii)} | ${region} (${ver}) |`,
+      `| ${e.ts} | ${providerName(e.provider)} | ${e.host} | ${e.path} | ${e.status} (${statusNote(e)}) | ${formatCounts(e.pii, partial)} | ${formatCounts(e.tokens, partial)} | ${region} — ${ver} |`,
     );
   }
   lines.push("");

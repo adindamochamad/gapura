@@ -8,7 +8,7 @@ function usage(): void {
   console.log(`Gapura — catat panggilan LLM (lokal)
 
 Perintah:
-  gapura demo              Demo satu perintah (mock LLM + laporan contoh)
+  gapura demo [--out <dir>]   Demo mock LLM + laporan (default: ./gapura-demo-out/)
   gapura report [opsi]     Buat laporan MD/HTML dari log JSONL
   gapura providers         Tampilkan tabel penyedia
   gapura proxy [opsi]      Proxy HTTP lokal (ganti base URL)
@@ -34,7 +34,11 @@ async function main(): Promise<void> {
   }
 
   if (cmd === "demo") {
-    await runDemo();
+    let outDir: string | undefined;
+    for (let i = 0; i < rest.length; i++) {
+      if (rest[i] === "--out" && rest[i + 1]) outDir = rest[++i];
+    }
+    await runDemo({ cwd: process.cwd(), outDir });
     return;
   }
 

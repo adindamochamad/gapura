@@ -1,6 +1,6 @@
 {
   "name": "gapura",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Catat panggilan LLM yang membawa data pribadi Indonesia; laporan Pasal 161 PP 33/2026. Lokal, open source.",
   "type": "module",
   "license": "MIT",
@@ -32,7 +32,9 @@
     "build": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
-    "demo": "node dist/cli/main.js demo",
+    "demo": "node dist/cli/main.js demo --out ./gapura-demo-out",
+    "verify:pack": "node scripts/verify-pack.mjs",
+    "test:coverage": "vitest run --coverage",
     "lint:forbidden": "node scripts/check-forbidden-words.mjs",
     "lint:secrets": "node scripts/check-secrets.mjs",
     "typecheck": "tsc --noEmit"
@@ -42,6 +44,7 @@
   },
   "devDependencies": {
     "@types/node": "22.10.2",
+    "@vitest/coverage-v8": "2.1.8",
     "typescript": "5.7.2",
     "vitest": "2.1.8"
   }

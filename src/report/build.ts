@@ -42,8 +42,7 @@ export function buildReportSummary(
     "Lokasi proses data di lapangan (bukan yang tertulis di dokumen)",
     "Akses tim dukungan dari luar negeri",
     "Teks prompt dan respons API",
-    "Putusan soal instrumen transfer (Pasal 165)",
-    "Klaim sertifikasi atau status kepatuhan",
+    "Klaim sertifikasi PDP pihak ketiga",
   ];
 
   return {

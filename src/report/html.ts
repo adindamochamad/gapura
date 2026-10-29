@@ -127,7 +127,7 @@ export function renderHtml(
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Transfer ke luar negeri — Gapura</title>
+  <title>Catatan panggilan LLM — Gapura</title>
   <style>${REPORT_CSS}</style>
 </head>
 <body>
@@ -150,8 +150,8 @@ export function renderHtml(
   <main class="shell">
     <header class="page-header">
       <span class="badge warn"><span class="dot"></span>${esc(LEGAL_DISCLAIMER)}</span>
-      <h1>Transfer ke luar negeri</h1>
-      <p class="lede">Panggilan LLM yang kena data pribadi Indonesia. Nama Gapura di sini tidak ada hubungannya dengan PT Gapura Angkasa.</p>
+      <h1>Catatan panggilan LLM</h1>
+      <p class="lede"><strong>Catatan bantu, bukan bukti kepatuhan.</strong> Panggilan ke host lokal atau jaringan privat bukan transfer lintas batas dari sisi Gapura. Nama Gapura di sini tidak ada hubungannya dengan PT Gapura Angkasa.</p>
     </header>
     <div class="metrics" aria-label="Ringkasan status">${metrics}</div>
     <div class="spread">

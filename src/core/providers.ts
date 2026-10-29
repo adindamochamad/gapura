@@ -62,6 +62,22 @@ export function resolveProvider(
   }
 
   if (!match) {
+    const local = rows.find((r) => r.id === "local");
+    if (
+      local &&
+      (h === "localhost" ||
+        h.endsWith(".localhost") ||
+        /^127\./.test(h) ||
+        /^10\./.test(h) ||
+        /^192\.168\./.test(h) ||
+        /^172\.(1[6-9]|2\d|3[01])\./.test(h) ||
+        h === "::1")
+    ) {
+      match = local;
+    }
+  }
+
+  if (!match) {
     match = rows.find((r) => r.id === "unknown")!;
   }
 
@@ -70,11 +86,19 @@ export function resolveProvider(
     override?.processing_region ?? match.processing_region;
   const verified_at = override?.verified_at ?? match.verified_at;
 
-  let verification = match.source_note;
-  if (processing_region === "belum terverifikasi") {
-    verification = "belum terverifikasi";
+  let verification: string;
+  if (override?.processing_region || override?.verified_at) {
+    verification = "diatur pengguna di gapura.config.json";
+  } else if (
+    match.id === "local" ||
+    match.id === "unknown" ||
+    processing_region === "belum terverifikasi"
+  ) {
+    verification = "tidak ada dokumentasi penyedia";
   } else if (verified_at) {
     verification = `menurut dokumentasi penyedia, diakses ${verified_at}`;
+  } else {
+    verification = match.source_note;
   }
 
   return {
