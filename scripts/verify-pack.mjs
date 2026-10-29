@@ -5,6 +5,15 @@ import { join } from "node:path";
 import { execSync } from "node:child_process";
 
 const root = process.cwd();
+const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+const expectedTgz = `gapura-${pkg.version}.tgz`;
+const readme = readFileSync(join(root, "README.md"), "utf8");
+if (!readme.includes(expectedTgz)) {
+  console.error(
+    `verify-pack: README.md must mention ${expectedTgz} (package.json version)`,
+  );
+  process.exit(1);
+}
 const tmp = mkdtempSync(join(tmpdir(), "gapura-pack-"));
 try {
   execSync("npm pack --pack-destination " + tmp, { cwd: root, stdio: "pipe" });
