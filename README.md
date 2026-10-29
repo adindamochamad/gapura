@@ -22,7 +22,7 @@ npm ci
 npm run build
 npm pack
 # di proyek lain:
-npm install /path/to/gapura-0.1.1.tgz
+npm install /path/to/gapura-0.1.3.tgz
 ```
 
 ## Demo satu perintah
