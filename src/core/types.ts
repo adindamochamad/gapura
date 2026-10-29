@@ -55,6 +55,7 @@ export type LogOutcome =
   | "ok"
   | "http_error"
   | "network_error"
+  | "timeout"
   | "aborted";
 
 export interface LogEntryV2 extends Omit<LogEntryV1, "v"> {
@@ -87,3 +88,6 @@ export interface GapuraConfig {
 }
 
 export const DEFAULT_MAX_BODY_BYTES = 5 * 1024 * 1024;
+
+/** Batas relay body request di proxy (bukan batas pemindaian). */
+export const DEFAULT_MAX_REQUEST_BYTES = 64 * 1024 * 1024;

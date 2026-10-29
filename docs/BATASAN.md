@@ -2,11 +2,12 @@
 
 - **`gapura proxy` beta, hanya loopback** — jangan di jaringan bersama.
 - Hanya melihat panggilan HTTP yang lewat **`wrapFetch`** (atau **`gapura proxy`** jika ada).
-- Query dan path **dipindai** untuk hitungan PII, tetapi **tidak disimpan** di log. Hanya body **JSON UTF-8** (atau teks yang bisa diparse JSON) yang dipindai penuh.
+- Query dan path **dipindai** untuk hitungan PII, tetapi **tidak disimpan** di log. Body JSON UTF-8, **urlencoded**, field teks FormData, dan part teks multipart (dalam anggaran inspect) ikut dipindai; file/binary/stream tetap partial.
 - **`clean`** = tidak terdeteksi pada cakupan penuh, **bukan jaminan**. **`unchecked`** + `reasons` = bagian request tidak dipindai atau error deteksi.
 - Log mencatat percobaan **beserta hasilnya** (`outcome`). Baris hilang hanya jika **penulisan log gagal** (fail-open sengaja).
 - Pemindaian per potongan bisa melewatkan data yang terbelah di batas potongan.
-- Base64 panjang, gambar, PDF, audio, body terkompres, stream: **`unchecked`**.
+- Base64 panjang: sampel decode + `base64-partial`; gagal decode → `base64-skipped`. Gambar/PDF/audio, body terkompres, stream/file: partial atau **`unchecked`**.
+- **`gapura proxy`**: default relay body request **64 MiB** (`--max-request-bytes`); pemindaian body tetap **5 MiB**.
 - Gateway lokal bisa meneruskan ke luar; Gapura tidak melihat lompatan berikutnya.
 - Normalisasi digit/spasi bisa false-positive — lihat tes negatif.
 - Tidak ada rotasi log (hapus berkas manual).

@@ -18,6 +18,7 @@ export function buildReportSummary(
   entries: LogEntry[],
   config: GapuraConfig = {},
   corrupt_lines = 0,
+  options: { generatedAt?: string } = {},
 ): ReportSummary {
   const by_status: Record<string, number> = {};
   const by_provider: Record<string, number> = {};
@@ -46,7 +47,7 @@ export function buildReportSummary(
   ];
 
   return {
-    generated_at: new Date().toISOString(),
+    generated_at: options.generatedAt ?? new Date().toISOString(),
     entry_count: entries.length,
     period,
     by_status,

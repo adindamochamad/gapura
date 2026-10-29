@@ -6,6 +6,7 @@ import {
 } from "./pasal161.js";
 import { buildReportSummary, providerName, type ReportSummary } from "./build.js";
 import type { GapuraConfig, LogEntry } from "../core/types.js";
+import { escapeMarkdownCell } from "./escape.js";
 
 function statusNote(entry: import("../core/types.js").LogEntry): string {
   if (entry.status === "clean") {
@@ -31,8 +32,9 @@ export function renderMarkdown(
   entries: LogEntry[],
   config: GapuraConfig = {},
   corrupt_lines = 0,
+  reportOptions: { generatedAt?: string } = {},
 ): string {
-  const s = buildReportSummary(entries, config, corrupt_lines);
+  const s = buildReportSummary(entries, config, corrupt_lines, reportOptions);
   const lines: string[] = [];
 
   lines.push("# Catatan panggilan LLM");
@@ -104,7 +106,7 @@ export function renderMarkdown(
     const ver = e.region_ref.verification;
     const partial = e.coverage === "partial";
     lines.push(
-      `| ${e.ts} | ${providerName(e.provider)} | ${e.host} | ${e.path} | ${e.status} (${statusNote(e)}) | ${formatCounts(e.pii, partial)} | ${formatCounts(e.tokens, partial)} | ${region} — ${ver} |`,
+      `| ${escapeMarkdownCell(e.ts)} | ${escapeMarkdownCell(providerName(e.provider))} | ${escapeMarkdownCell(e.host)} | ${escapeMarkdownCell(e.path)} | ${escapeMarkdownCell(e.status)} (${escapeMarkdownCell(statusNote(e))}) | ${escapeMarkdownCell(formatCounts(e.pii, partial))} | ${escapeMarkdownCell(formatCounts(e.tokens, partial))} | ${escapeMarkdownCell(region)} — ${escapeMarkdownCell(ver)} |`,
     );
   }
   lines.push("");

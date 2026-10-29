@@ -6,8 +6,8 @@ Panggilan ke host lokal atau jaringan privat bukan transfer lintas batas dari si
 
 **Bukan pendapat hukum.**
 
-Dibuat: 2026-10-29T04:23:33.808Z
-Periode log: 2026-10-29T04:23:33.788Z — 2026-10-29T04:23:33.805Z
+Dibuat: 2026-10-29T04:00:00.000Z
+Periode log: 2026-10-29T04:00:00.000Z — 2026-10-29T04:00:00.000Z
 Jumlah permintaan: 3
 
 Kutip Pasal 161 dari OCR legaltrans.id; belum dicocokkan ke JDIH resmi.
@@ -79,9 +79,9 @@ Butir h membahas format data yang dikirim — plain text, disamarkan, atau teren
 
 | Waktu (UTC) | Penyedia | Host | Path | Status | PII | Token | Wilayah |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2026-10-29T04:23:33.788Z | OpenAI API | api.openai.com | /v1/chat/completions | raw (raw) | NIK:1, TELEPON:1, EMAIL:1 | — | belum terverifikasi — tidak ada dokumentasi penyedia |
-| 2026-10-29T04:23:33.802Z | Anthropic API | api.anthropic.com | /v1/messages | masked (masked) | — | NIK:1, TELEPON:1 | global (default inference) atau US (inference_geo=us); workspace geo saat ini hanya US — menurut dokumentasi penyedia, diakses 2026-10-28 |
-| 2026-10-29T04:23:33.805Z | OpenAI API | api.openai.com | /v1/chat/completions | clean (tidak terdeteksi, bukan jaminan) | — | — | belum terverifikasi — tidak ada dokumentasi penyedia |
+| 2026-10-29T04:00:00.000Z | OpenAI API | api.openai.com | /v1/chat/completions | raw (raw) | NIK:1, TELEPON:1, EMAIL:1 | — | belum terverifikasi — tidak ada dokumentasi penyedia |
+| 2026-10-29T04:00:00.000Z | Anthropic API | api.anthropic.com | /v1/messages | masked (masked) | — | NIK:1, TELEPON:1 | global (default inference) atau US (inference_geo=us); workspace geo saat ini hanya US — menurut dokumentasi penyedia, diakses 2026-10-28 |
+| 2026-10-29T04:00:00.000Z | OpenAI API | api.openai.com | /v1/chat/completions | clean (tidak terdeteksi, bukan jaminan) | — | — | belum terverifikasi — tidak ada dokumentasi penyedia |
 
 ## Luar lingkup laporan
 

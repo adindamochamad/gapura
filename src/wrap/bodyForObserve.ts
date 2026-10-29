@@ -1,5 +1,6 @@
 import { DEFAULT_MAX_BODY_BYTES } from "../core/types.js";
 import type { CoverageReason } from "../core/reasons.js";
+import { extractTextsFromFormData } from "../core/bodyExtract.js";
 
 export interface BodyForObservation {
   url: string;
@@ -101,8 +102,22 @@ export function bodyForObservation(
   }
 
   if (typeof FormData !== "undefined" && body instanceof FormData) {
-    extraReasons.push("multipart");
-    return { url, method, headers, bodyText: null, bodyBytes: 0, extraReasons };
+    const scanTexts: string[] = [];
+    const reasonSet = new Set<CoverageReason>();
+    const { bodyBytes: fdBytes } = extractTextsFromFormData(
+      body,
+      scanTexts,
+      reasonSet,
+    );
+    for (const r of reasonSet) extraReasons.push(r);
+    return {
+      url,
+      method,
+      headers,
+      bodyText: scanTexts.join("\n"),
+      bodyBytes: fdBytes,
+      extraReasons,
+    };
   }
 
   if (isStreamLike(body)) {

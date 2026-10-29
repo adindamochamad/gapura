@@ -1,6 +1,10 @@
 import type { GapuraConfig } from "../core/types.js";
 import { observeHttpRequest } from "../core/observe.js";
 import { appendLogEntry, type LoggerOptions } from "../core/logger.js";
+import {
+  isAbortError,
+  outcomeFromFetchError,
+} from "../core/outcomeFromError.js";
 import { bodyForObservation, shouldLogHost } from "./bodyForObserve.js";
 
 export interface WrapFetchOptions {
@@ -14,10 +18,6 @@ export interface WrapFetchOptions {
   hosts?: string[];
   excludeHosts?: string[];
   onError?: (err: unknown) => void;
-}
-
-function isAbortError(err: unknown): boolean {
-  return err instanceof DOMException && err.name === "AbortError";
 }
 
 export function wrapFetch(baseFetch: typeof fetch, options: WrapFetchOptions) {
@@ -69,7 +69,9 @@ export function wrapFetch(baseFetch: typeof fetch, options: WrapFetchOptions) {
       }
       return response;
     } catch (err) {
-      entry.outcome = isAbortError(err) ? "aborted" : "network_error";
+      entry.outcome = isAbortError(err)
+        ? "aborted"
+        : outcomeFromFetchError(err);
       try {
         appendLogEntry(entry, logOpts);
       } catch (logErr) {

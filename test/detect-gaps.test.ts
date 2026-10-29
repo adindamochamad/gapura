@@ -125,11 +125,22 @@ describe("detect gaps — reproduksi review", () => {
     expect(entry.model).toBeUndefined();
   });
 
-  it("10: base64 skipped → unchecked", () => {
+  it("10: long base64 without payload → unchecked partial", () => {
     const b64 = "Y".repeat(220);
     const { entry } = observe({ m: b64 });
     expect(entry.status).toBe("unchecked");
-    expect(entry.reasons).toContain("base64-skipped");
+    expect(entry.reasons).toContain("base64-partial");
+  });
+
+  it("10b: NIK inside long base64 → raw with base64-partial", () => {
+    const SYNTHETIC_NIK = "3171010101010000";
+    const inner = JSON.stringify({ nik: SYNTHETIC_NIK });
+    const padded = inner + "x".repeat(180);
+    const b64 = Buffer.from(padded, "utf8").toString("base64");
+    expect(b64.length).toBeGreaterThanOrEqual(200);
+    const { entry } = observe({ payload: b64 });
+    expect(entry.status).toBe("raw");
+    expect(entry.reasons).toContain("base64-partial");
   });
 
   it("11: hp number does not crash", () => {

@@ -13,6 +13,7 @@ import {
   statusIcon,
   statusPhrase,
 } from "./theme.js";
+import { escapeHtml } from "./escape.js";
 
 function formatTs(iso: string): string {
   const d = new Date(iso);
@@ -25,11 +26,7 @@ function formatTs(iso: string): string {
 }
 
 function esc(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  return escapeHtml(s);
 }
 
 function labelClass(label: string): string {
@@ -53,9 +50,15 @@ export function renderHtml(
   entries: LogEntry[],
   config: GapuraConfig = {},
   corrupt_lines = 0,
+  reportOptions: { generatedAt?: string } = {},
 ): string {
-  const s = buildReportSummary(entries, config, corrupt_lines);
-  const mdFallback = renderMarkdown(entries, config);
+  const s = buildReportSummary(entries, config, corrupt_lines, reportOptions);
+  const mdFallback = renderMarkdown(
+    entries,
+    config,
+    corrupt_lines,
+    reportOptions,
+  );
   const statuses = ["raw", "masked", "mixed", "clean", "unchecked"] as const;
 
   const badgeClass: Record<(typeof statuses)[number], string> = {

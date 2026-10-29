@@ -1,12 +1,7 @@
-import { randomUUID } from "node:crypto";
 import type { CallStatus, GapuraConfig, LogEntryV2 } from "./types.js";
 import { DEFAULT_MAX_BODY_BYTES as MAX_BYTES } from "./types.js";
-import {
-  collectFromJson,
-  tryParseJsonBody,
-  type JsonExtractState,
-} from "./extract.js";
-import { extractSafeModelField } from "./modelField.js";
+import { appendBodyTextsForObservation } from "./bodyExtract.js";
+import { gapuraObserveId, gapuraObserveTimestamp } from "./observeHooks.js";
 import { scanPayloadSync } from "./scanPayload.js";
 import { classifyCall } from "./classify.js";
 import { resolveProvider } from "./providers.js";
@@ -50,8 +45,6 @@ function bodySkipReasons(
   max: number,
 ): CoverageReason[] {
   const reasons: CoverageReason[] = [];
-  const ct = (headers.get("content-type") ?? "").toLowerCase();
-  if (ct.includes("multipart/form-data")) reasons.push("multipart");
   if (headers.get("content-encoding")) reasons.push("compressed");
   if (bodyBytes > max) reasons.push("too-large");
   return reasons;
@@ -76,22 +69,31 @@ export function observeHttpRequest(input: ObserveInput): ObserveOutput {
     if (!skipReasons.includes("too-large") && input.bodyBytes <= max) {
       reasons.add("stream-not-inspected");
     }
-  } else if (skipReasons.length === 0) {
+  } else if (
+    !skipReasons.includes("compressed") &&
+    !skipReasons.includes("too-large")
+  ) {
+    const ct = (input.headers.get("content-type") ?? "").toLowerCase();
     if (!input.bodyText.trim()) {
-      /* empty body — tidak ada yang dipindai di body */
-    } else {
-      const ct = (input.headers.get("content-type") ?? "").toLowerCase();
-      if (ct && !ct.includes("json")) {
-        reasons.add("unsupported-content-type");
+      if (ct.includes("multipart/form-data")) {
+        reasons.add("multipart");
       }
-      const parsed = tryParseJsonBody(input.bodyText);
-      if (parsed === null) {
-        reasons.add("non-json");
+    } else {
+      const formDataExtract =
+        (input.extraReasons ?? []).includes("multipart") &&
+        !ct.includes("multipart/form-data");
+      if (formDataExtract) {
+        for (const line of input.bodyText.split("\n")) {
+          if (line) scanTexts.push(line);
+        }
       } else {
-        const state: JsonExtractState = { texts: scanTexts, reasons: new Set() };
-        collectFromJson(parsed, state);
-        for (const r of state.reasons) reasons.add(r);
-        model = extractSafeModelField(parsed);
+        model = appendBodyTextsForObservation(
+          input.bodyText,
+          ct,
+          max,
+          scanTexts,
+          reasons,
+        );
       }
     }
   }
@@ -123,8 +125,8 @@ export function observeHttpRequest(input: ObserveInput): ObserveOutput {
 
   const entry: LogEntryV2 = {
     v: 2,
-    id: randomUUID(),
-    ts: new Date().toISOString(),
+    id: gapuraObserveId(),
+    ts: gapuraObserveTimestamp(),
     provider: provider.id,
     host: url.hostname,
     path: sanitizePathForLog(url.pathname || "/"),

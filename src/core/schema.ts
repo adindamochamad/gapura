@@ -16,7 +16,13 @@ const STATUS_SET = new Set([
 const COVERAGE_SET = new Set(["full", "partial"]);
 const REASON_SET = new Set<string>(COVERAGE_REASONS);
 const PII_SET = new Set<string>(PII_TYPES);
-const OUTCOME_SET = new Set(["ok", "http_error", "network_error", "aborted"]);
+const OUTCOME_SET = new Set([
+  "ok",
+  "http_error",
+  "network_error",
+  "timeout",
+  "aborted",
+]);
 
 export class SchemaError extends Error {
   constructor(message: string) {

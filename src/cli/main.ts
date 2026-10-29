@@ -35,10 +35,12 @@ async function main(): Promise<void> {
 
   if (cmd === "demo") {
     let outDir: string | undefined;
+    let deterministic = false;
     for (let i = 0; i < rest.length; i++) {
       if (rest[i] === "--out" && rest[i + 1]) outDir = rest[++i];
+      else if (rest[i] === "--deterministic") deterministic = true;
     }
-    await runDemo({ cwd: process.cwd(), outDir });
+    await runDemo({ cwd: process.cwd(), outDir, deterministic });
     return;
   }
 

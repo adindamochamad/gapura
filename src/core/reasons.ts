@@ -6,6 +6,7 @@ export const COVERAGE_REASONS = [
   "stream-not-inspected",
   "too-large",
   "base64-skipped",
+  "base64-partial",
   "number-precision-lost",
   "time-budget",
   "detector-error",

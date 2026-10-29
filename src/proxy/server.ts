@@ -8,6 +8,7 @@ import {
 import { request as httpsRequest } from "node:https";
 import { pipeline } from "node:stream/promises";
 import type { GapuraConfig, LogOutcome } from "../core/types.js";
+import { DEFAULT_MAX_REQUEST_BYTES } from "../core/types.js";
 import { observeHttpRequest } from "../core/observe.js";
 import { appendLogEntry, type LoggerOptions } from "../core/logger.js";
 import { createRequestBodyBridge, parseClientRequestPath } from "./body.js";
@@ -33,6 +34,7 @@ export interface ProxyServerOptions {
   label?: string;
   strictSchema?: boolean;
   timeoutMs?: number;
+  maxRequestBytes?: number;
   onError?: (err: unknown) => void;
 }
 
@@ -72,6 +74,17 @@ function buildUpstreamUrl(
   return `${target.origin}${pathname}${search}`;
 }
 
+function parseContentLengthHeader(
+  headers: IncomingMessage["headers"],
+): number | null {
+  const raw = headers["content-length"];
+  const s = Array.isArray(raw) ? raw[0] : raw;
+  if (s === undefined || s === "") return null;
+  const n = Number.parseInt(s, 10);
+  if (!Number.isFinite(n) || n < 0) return null;
+  return n;
+}
+
 export function startGapuraProxy(
   options: ProxyServerOptions,
 ): Promise<ProxyServerHandle> {
@@ -81,6 +94,8 @@ export function startGapuraProxy(
     strictSchema: options.strictSchema,
   };
   const timeoutMs = options.timeoutMs ?? 60_000;
+  const maxRequestBytes =
+    options.maxRequestBytes ?? DEFAULT_MAX_REQUEST_BYTES;
 
   return new Promise((resolve, reject) => {
     const server: Server = createServer(async (req, res) => {
@@ -128,10 +143,43 @@ export function startGapuraProxy(
         }
 
         const method = req.method ?? "GET";
+        const contentLength = parseContentLengthHeader(req.headers);
+        if (
+          contentLength !== null &&
+          contentLength > maxRequestBytes
+        ) {
+          try {
+            const headerPairs: [string, string][] = [];
+            for (const [k, v] of Object.entries(req.headers)) {
+              if (v === undefined) continue;
+              if (Array.isArray(v)) for (const x of v) headerPairs.push([k, x]);
+              else headerPairs.push([k, v]);
+            }
+            const { entry } = observeHttpRequest({
+              url: upstreamUrl.toString(),
+              method,
+              headers: new Headers(headerPairs),
+              bodyText: null,
+              bodyBytes: contentLength,
+              label: options.label ?? options.config?.label,
+              config: options.config,
+              extraReasons: ["too-large"],
+            });
+            entry.outcome = "http_error";
+            entry.http_status = 413;
+            appendLogEntry(entry, logOpts);
+          } catch (err) {
+            if (options.onError) options.onError(err);
+          }
+          sendText(res, 413, "Payload Too Large");
+          req.resume();
+          return;
+        }
+
         const bridge =
           method === "GET" || method === "HEAD"
             ? null
-            : createRequestBodyBridge(req);
+            : createRequestBodyBridge(req, undefined, maxRequestBytes);
 
         const headers: Record<string, string | string[]> = {};
         for (const [key, value] of Object.entries(req.headers)) {
@@ -222,18 +270,29 @@ export function startGapuraProxy(
 
         upstreamReq.on("timeout", () => {
           upstreamReq.destroy();
-          outcome = "network_error";
+          outcome = "timeout";
+          http_status = 504;
           void logResult();
           sendText(res, 504, "Gateway Timeout");
         });
 
         upstreamReq.on("error", () => {
+          if (logged) return;
           outcome = "network_error";
           void logResult();
           sendText(res, 502, "Bad Gateway");
         });
 
         if (bridge) {
+          void bridge.finished.then((bodyInfo) => {
+            if (bodyInfo.requestRejected) {
+              upstreamReq.destroy();
+              outcome = "http_error";
+              http_status = 413;
+              sendText(res, 413, "Payload Too Large");
+              void logResult();
+            }
+          });
           bridge.forward.pipe(upstreamReq);
         } else {
           upstreamReq.end();

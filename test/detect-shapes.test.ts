@@ -95,13 +95,13 @@ describe("detection edge cases", () => {
     expect(pii.NIK).toBeGreaterThan(0);
   });
 
-  it("skips long base64-like blobs", () => {
+  it("samples long base64-like blobs without keeping raw blob", () => {
     const blob = "A".repeat(250);
     const body = { only: blob };
     const strings: string[] = [];
     extractStringsFromJson(body, strings);
     expect(strings).not.toContain(blob);
-    expect(strings).toEqual(["only"]);
+    expect(strings).toContain("only");
   });
 
   it("known miss: unlabeled name not counted as NAMA", () => {

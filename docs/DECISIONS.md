@@ -8,11 +8,12 @@
 ## Skema log v2
 
 - `outcome` + `http_status` ditulis setelah hasil fetch/proxy diketahui.
+- Nilai `outcome`: `ok`, `http_error`, `network_error`, `timeout`, `aborted`.
 - `clean` hanya dengan `coverage: full`.
 
 ## Base64 dan normalisasi
 
-- Base64 panjang tanpa spasi → `base64-skipped`, bukan `clean` palsu.
+- Base64 panjang: decode sampel terbatas (~16 KiB) + alasan `base64-partial`; gagal decode → `base64-skipped`.
 - `normalizeForScan` di Gapura (NFKC, digit Unicode, zero-width, gabung digit).
 
 ## Anggaran pemindaian

@@ -21,6 +21,7 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - run: npm run examples:check
       - run: npm run demo
       - run: node dist/cli/main.js proxy --help
       - run: npm run lint:forbidden
