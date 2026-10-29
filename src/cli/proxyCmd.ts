@@ -22,6 +22,7 @@ function parseListen(listen: string): { host: string; port: number } {
 
 export function printProxyUsage(): void {
   console.log(`Gapura proxy — HTTP lokal, observasi body request
+Eksperimental — jangan dijalankan di jaringan bersama.
 
 Opsi:
   --listen <host:port>   Default: 127.0.0.1:8787
@@ -65,6 +66,9 @@ export async function runProxyCli(
     config,
   });
 
+  console.error(
+    "gapura proxy: eksperimental — jangan dijalankan di jaringan bersama.",
+  );
   console.log(`Proxy ${handle.baseUrl} → ${target.replace(/\/$/, "")}`);
   console.log(`Log: ${logDir ?? defaultLogDir(cwd)}`);
   console.log("Tekan Ctrl+C untuk berhenti.");

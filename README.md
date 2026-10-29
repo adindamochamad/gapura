@@ -56,6 +56,8 @@ Anthropic SDK: `new Anthropic({ fetch: wrapFetch(globalThis.fetch, { logDir: "..
 
 ## Proxy (Python, curl, dll.)
 
+**Eksperimental — jangan dijalankan di jaringan bersama.**
+
 ```bash
 npx gapura proxy --target https://api.openai.com --listen 127.0.0.1:8787
 ```
