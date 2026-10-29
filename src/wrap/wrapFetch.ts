@@ -1,9 +1,7 @@
-import type { GapuraConfig, LogOutcome } from "../core/types.js";
-import {
-  observeHttpRequest,
-  readRequestBodyForObservation,
-} from "../core/observe.js";
+import type { GapuraConfig } from "../core/types.js";
+import { observeHttpRequest } from "../core/observe.js";
 import { appendLogEntry, type LoggerOptions } from "../core/logger.js";
+import { bodyForObservation, shouldLogHost } from "./bodyForObserve.js";
 
 export interface WrapFetchOptions {
   fetch?: typeof fetch;
@@ -12,17 +10,10 @@ export interface WrapFetchOptions {
   config?: GapuraConfig;
   strictSchema?: boolean;
   onUnknownKey?: "drop" | "throw";
+  maxBodyBytes?: number;
+  hosts?: string[];
+  excludeHosts?: string[];
   onError?: (err: unknown) => void;
-}
-
-function buildRequest(input: RequestInfo | URL, init?: RequestInit): Request {
-  if (input instanceof Request) {
-    if (init) {
-      return new Request(input, init);
-    }
-    return input;
-  }
-  return new Request(input, init);
 }
 
 function isAbortError(err: unknown): boolean {
@@ -40,58 +31,34 @@ export function wrapFetch(baseFetch: typeof fetch, options: WrapFetchOptions) {
     input: RequestInfo | URL,
     init?: RequestInit,
   ): Promise<Response> {
-    let request: Request;
-    try {
-      request = buildRequest(input, init);
-    } catch (err) {
-      if (options.onError) options.onError(err);
-      else console.error("gapura: observation failed");
-      return baseFetch(input as RequestInfo, init);
-    }
-
-    let bodyText: string | null = null;
-    let bodyBytes = 0;
-    try {
-      const body = await readRequestBodyForObservation(request);
-      bodyText = body.bodyText;
-      bodyBytes = body.bodyBytes;
-    } catch (err) {
-      if (options.onError) options.onError(err);
-      else console.error("gapura: observation failed");
-    }
-
-    const observeInput = {
-      url: request.url,
-      method: request.method,
-      headers: request.headers,
-      bodyText,
-      bodyBytes,
-      label: options.label ?? options.config?.label,
-      config: options.config,
-    };
+    const fetchPromise = baseFetch(input, init);
 
     let entry;
     try {
-      ({ entry } = observeHttpRequest(observeInput));
+      const body = bodyForObservation(input, init, options.maxBodyBytes);
+      const host = new URL(body.url).hostname;
+      if (!shouldLogHost(host, options)) {
+        return fetchPromise;
+      }
+      ({ entry } = observeHttpRequest({
+        url: body.url,
+        method: body.method,
+        headers: body.headers,
+        bodyText: body.bodyText,
+        bodyBytes: body.bodyBytes,
+        label: options.label ?? options.config?.label,
+        config: options.config,
+        maxBodyBytes: options.maxBodyBytes,
+        extraReasons: body.extraReasons,
+      }));
     } catch (err) {
       if (options.onError) options.onError(err);
       else console.error("gapura: observation failed");
-      try {
-        ({ entry } = observeHttpRequest({
-          ...observeInput,
-          bodyText: null,
-          bodyBytes: 0,
-        }));
-        entry.status = "unchecked";
-        entry.coverage = "partial";
-        entry.reasons = [...(entry.reasons ?? []), "detector-error"];
-      } catch {
-        return baseFetch(request);
-      }
+      return fetchPromise;
     }
 
     try {
-      const response = await baseFetch(request);
+      const response = await fetchPromise;
       entry.outcome = response.status >= 400 ? "http_error" : "ok";
       entry.http_status = response.status;
       try {

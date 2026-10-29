@@ -22,6 +22,7 @@ export interface ObserveInput {
   label?: string;
   config?: GapuraConfig;
   maxBodyBytes?: number;
+  extraReasons?: CoverageReason[];
 }
 
 export interface ObserveOutput {
@@ -67,6 +68,7 @@ export function observeHttpRequest(input: ObserveInput): ObserveOutput {
   const reasons = new Set<CoverageReason>();
   const skipReasons = bodySkipReasons(input.headers, input.bodyBytes, max);
   for (const r of skipReasons) reasons.add(r);
+  for (const r of input.extraReasons ?? []) reasons.add(r);
 
   let model: string | undefined;
 
