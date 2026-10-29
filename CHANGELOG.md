@@ -1,10 +1,22 @@
+## 0.1.4 — 2026-10-29
+
+### Fixed
+
+- **`viewer/index.html` ter-commit** disinkronkan dengan `renderViewerPage()` (escape `"`/`'`, whitelist `status`); `examples:check` memverifikasi viewer + laporan contoh
+- Mutasi **M8** menarget `bodyExtract.ts`; **`npm run mutation:patterns`** gagal cepat jika pola hilang (CI)
+- **`docs/BATASAN.md`**: base64 pendek (< 200 karakter) tidak di-decode
+
+### Added
+
+- Tes FormData via `wrapFetch`; script `write-viewer.mjs`; catatan audit independen (`AUDIT.md` terhadap `ff9a47f`)
+
 ## 0.1.3 — 2026-10-29
 
 ### Fixed
 
 - Log `outcome`: **`timeout`** terpisah dari `network_error` (proxy 504 + klasifikasi error fetch)
 - Base64 panjang: decode sampel (~16 KiB) + alasan `base64-partial` — NIK ter-encode tidak lagi invisible
-- Viewer HTML: escape `"`/`'`, whitelist `status`; laporan Markdown escape `|` di tabel
+- Viewer HTML: escape `"`/`'` + whitelist `status` di **`viewer/index.html` ter-commit** (bukan hanya generator); laporan Markdown escape `|` di tabel
 - Proxy: **`--max-request-bytes`** (default 64 MiB) → 413 + log; relay stream besar tetap bounded memory (tes)
 
 ### Added
@@ -19,7 +31,7 @@
 
 ### Known limitations
 
-- Pemindaian sinkron body besar masih bisa ~700 ms (`time-budget`); multipart file/binary tetap partial; enkripsi TLS tidak dianalisis
+- Pemindaian sinkron body besar masih bisa ~700 ms (`time-budget`); multipart file/binary tetap partial; enkripsi TLS tidak dianalisis; NIK di base64 **pendek** (< 200 karakter) tidak di-decode
 
 ## 0.1.2 — 2026-10-29
 

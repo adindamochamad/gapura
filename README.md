@@ -4,7 +4,7 @@ Mencatat panggilan LLM yang membawa data pribadi Indonesia, lalu mencetak **cata
 
 **Belum ada di npm.** Clone repo ini, `npm ci`, `npm run build`, lalu `npm pack` dan pasang tarball di proyek lain (atau `npm link`).
 
-**Bukan pendapat hukum.** Tidak terkait PT Gapura Angkasa.
+**Bukan pendapat hukum.** Catatan bantu **bukan bukti kepatuhan.** Tidak terkait PT Gapura Angkasa.
 
 Pasangan penyamaran: [@adindamochamad/tirai](https://github.com/adindamochamad/tirai).
 

@@ -143,6 +143,14 @@ describe("detect gaps — reproduksi review", () => {
     expect(entry.reasons).toContain("base64-partial");
   });
 
+  it("10c: short base64 NIK classification", () => {
+    const b64 = Buffer.from(SYNTHETIC_NIK, "utf8").toString("base64");
+    const { entry } = observe({ m: b64 });
+    expect(b64.length).toBeLessThan(200);
+    expect(entry.status).toBe("clean");
+    expect(entry.reasons ?? []).not.toContain("base64-partial");
+  });
+
   it("11: hp number does not crash", () => {
     const { entry } = observe({ hp: 628123456789 });
     expect(entry.status).toBeDefined();

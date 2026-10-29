@@ -6,7 +6,7 @@
 - **`clean`** = tidak terdeteksi pada cakupan penuh, **bukan jaminan**. **`unchecked`** + `reasons` = bagian request tidak dipindai atau error deteksi.
 - Log mencatat percobaan **beserta hasilnya** (`outcome`). Baris hilang hanya jika **penulisan log gagal** (fail-open sengaja).
 - Pemindaian per potongan bisa melewatkan data yang terbelah di batas potongan.
-- Base64 panjang: sampel decode + `base64-partial`; gagal decode → `base64-skipped`. Gambar/PDF/audio, body terkompres, stream/file: partial atau **`unchecked`**.
+- Base64 panjang (≥ 200 karakter, tanpa spasi): sampel decode + `base64-partial`; gagal decode → `base64-skipped`. **Base64 pendek** (< 200 karakter) dipindai apa adanya, **tidak di-decode** — NIK yang hanya ada di dalam blob base64 pendek bisa tercatat `clean`. Gambar/PDF/audio, body terkompres, stream/file: partial atau **`unchecked`**.
 - **`gapura proxy`**: default relay body request **64 MiB** (`--max-request-bytes`); pemindaian body tetap **5 MiB**.
 - Gateway lokal bisa meneruskan ke luar; Gapura tidak melihat lompatan berikutnya.
 - Normalisasi digit/spasi bisa false-positive — lihat tes negatif.

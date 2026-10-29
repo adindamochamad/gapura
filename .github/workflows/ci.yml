@@ -24,6 +24,7 @@ jobs:
       - run: npm run examples:check
       - run: npm run demo
       - run: node dist/cli/main.js proxy --help
+      - run: npm run mutation:patterns
       - run: npm run lint:forbidden
       - run: npm run lint:secrets
       - run: npm run verify:pack

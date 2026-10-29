@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { renderHtml } from "../src/report/html.js";
 import { renderMarkdown } from "../src/report/markdown.js";
@@ -50,5 +52,16 @@ describe("report escape", () => {
     const page = renderViewerPage();
     expect(page).toContain('replace(/"/g,"&quot;")');
     expect(page).toContain("ALLOWED_STATUS");
+  });
+
+  it("committed viewer/index.html matches generator escape", () => {
+    const committed = readFileSync(
+      join(process.cwd(), "viewer/index.html"),
+      "utf8",
+    );
+    const generated = renderViewerPage();
+    expect(committed).toBe(generated);
+    expect(committed).toContain('replace(/"/g,"&quot;")');
+    expect(committed).toContain("ALLOWED_STATUS");
   });
 });

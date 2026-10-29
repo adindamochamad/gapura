@@ -482,7 +482,11 @@ code { font-family: ui-monospace, "Segoe UI Mono", monospace; font-size: 0.92em;
     const PHRASE = {"raw":"Ikut apa adanya","masked":"Body kelihatan disamarkan","mixed":"Campuran utuh & samar","clean":"Tidak ada yang kebaca","unchecked":"Lewat tanpa dicek"};
     const BADGE = { raw: "bad", masked: "ok", mixed: "mix", clean: "idle", unchecked: "warn" };
     function esc(s) {
-      return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+      return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+    }
+    const ALLOWED_STATUS = new Set(["raw","masked","mixed","clean","unchecked"]);
+    function safeStatus(s) {
+      return ALLOWED_STATUS.has(s) ? s : "unchecked";
     }
     const drop = document.getElementById("drop");
     const fileInput = document.getElementById("file");
@@ -534,8 +538,8 @@ code { font-family: ui-monospace, "Segoe UI Mono", monospace; font-size: 0.92em;
       const rows = entries.map((e) => {
         const pii = Object.entries(e.pii || {}).map(([k,v]) => k + "×" + v).join(", ") || "—";
         const region = (e.region_ref && e.region_ref.processing_region) || "—";
-        return "<tr><td><span class=\"badge " + (BADGE[e.status]||"") + " pill status-" + esc(e.status) +
-          '\"><span class="dot"></span>' + (ICONS[e.status]||"") + " " + esc(e.status) +
+        return "<tr><td><span class=\"badge " + (BADGE[e.status]||"") + " pill status-" + esc(safeStatus(e.status)) +
+          '\"><span class="dot"></span>' + (ICONS[safeStatus(e.status)]||"") + " " + esc(safeStatus(e.status)) +
           "</span></td><td><p class=where>" + esc(e.provider) + '</p><p class=muted>' +
           esc(e.host) + esc(e.path) + "</p></td><td><p class=muted>" + esc(pii) +
           "</p><p class=muted>" + esc(region) + "</p></td></tr>";

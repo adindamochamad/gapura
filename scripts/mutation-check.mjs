@@ -69,10 +69,10 @@ const MUTATIONS = [
   },
   {
     id: "M8",
-    file: "src/core/observe.ts",
-    find: "model = extractSafeModelField(parsed);",
+    file: "src/core/bodyExtract.ts",
+    find: "    return extractSafeModelField(parsed);",
     replace:
-      "model = typeof (parsed as Record<string, unknown>).model === \"string\" ? ((parsed as Record<string, unknown>).model as string) : undefined;",
+      "    return typeof (parsed as Record<string, unknown>).model === \"string\" ? ((parsed as Record<string, unknown>).model as string) : undefined;",
     tests: "test/detect-gaps.test.ts",
   },
   {
@@ -152,6 +152,29 @@ function runMutation(root, m) {
 }
 
 const root = process.cwd();
+
+function missingPatterns(base) {
+  const missing = [];
+  for (const m of MUTATIONS) {
+    const text = readFileSync(join(base, m.file), "utf8");
+    if (!text.includes(m.find)) missing.push({ id: m.id, file: m.file });
+  }
+  return missing;
+}
+
+{
+  const missing = missingPatterns(root);
+  if (missing.length) {
+    console.error("Pola mutasi tidak ditemukan:", missing);
+    process.exit(1);
+  }
+}
+
+if (process.argv.includes("--patterns-only")) {
+  console.log("Semua pola M1–M14 ada di working tree.");
+  process.exit(0);
+}
+
 const results = [];
 
 for (const m of MUTATIONS) {

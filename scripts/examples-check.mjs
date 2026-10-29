@@ -3,6 +3,7 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runDemo } from "../dist/cli/demo.js";
+import { renderViewerPage } from "../dist/report/viewerPage.js";
 
 function sha256(path) {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
@@ -25,4 +26,13 @@ for (const [a, b] of pairs) {
   }
 }
 rmSync(tmp, { recursive: true, force: true });
+const committedViewer = readFileSync(
+  join(root, "viewer/index.html"),
+  "utf8",
+);
+if (committedViewer !== renderViewerPage()) {
+  console.error("Mismatch: viewer/index.html — run npm run examples:update");
+  process.exit(1);
+}
 console.log("examples/sample-reports match deterministic demo.");
+console.log("viewer/index.html matches renderViewerPage().");
