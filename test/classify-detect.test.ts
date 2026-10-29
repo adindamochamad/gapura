@@ -10,11 +10,15 @@ const SINTETIS_HP = "0800-0000-0001";
 
 describe("classifyCall", () => {
   it("maps five statuses", () => {
-    expect(classifyCall({ NIK: 1 }, {}, false)).toBe("raw");
-    expect(classifyCall({}, { NIK: 1 }, false)).toBe("masked");
-    expect(classifyCall({ NIK: 1 }, { TELEPON: 1 }, false)).toBe("mixed");
-    expect(classifyCall({}, {}, false)).toBe("clean");
-    expect(classifyCall({ NIK: 1 }, {}, true)).toBe("unchecked");
+    expect(classifyCall({ NIK: 1 }, {}, { coverage: "full" })).toBe("raw");
+    expect(classifyCall({}, { NIK: 1 }, { coverage: "full" })).toBe("masked");
+    expect(classifyCall({ NIK: 1 }, { TELEPON: 1 }, { coverage: "full" })).toBe(
+      "mixed",
+    );
+    expect(classifyCall({}, {}, { coverage: "full" })).toBe("clean");
+    expect(
+      classifyCall({ NIK: 1 }, {}, { coverage: "full", forceUnchecked: true }),
+    ).toBe("unchecked");
   });
 });
 
@@ -49,7 +53,7 @@ describe("detection in JSON bodies", () => {
     const strings = [redacted];
     const pii = countPiiInText(redacted);
     const tokens = countTiraiTokens(redacted);
-    expect(classifyCall(pii, tokens, false)).toBe("masked");
+    expect(classifyCall(pii, tokens, { coverage: "full" })).toBe("masked");
   });
 });
 

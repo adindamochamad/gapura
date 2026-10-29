@@ -61,6 +61,8 @@ describe("privacy — log tidak menyimpan data asli", () => {
       "messages",
       "Authorization",
     ];
+    const files = readdirSync(logDir);
+    expect(files.length).toBeGreaterThan(0);
     const hits = scanDirForForbidden(logDir, forbidden);
     expect(hits).toEqual([]);
   });

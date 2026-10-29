@@ -1,3 +1,5 @@
+import type { Coverage, CoverageReason } from "./reasons.js";
+
 export type CallStatus = "raw" | "masked" | "mixed" | "clean" | "unchecked";
 
 export type PiiCounts = Partial<Record<string, number>>;
@@ -23,6 +25,8 @@ export interface LogEntryV1 {
   pii: PiiCounts;
   tokens: TokenCounts;
   bytes: number;
+  coverage: Coverage;
+  reasons?: CoverageReason[];
   label?: string;
   region_ref: RegionRef;
 }
@@ -39,6 +43,8 @@ export const LOG_SCHEMA_KEYS = [
   "pii",
   "tokens",
   "bytes",
+  "coverage",
+  "reasons",
   "label",
   "region_ref",
 ] as const;

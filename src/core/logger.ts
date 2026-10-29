@@ -8,11 +8,15 @@ import {
 } from "node:fs";
 import { dirname } from "node:path";
 import type { LogEntryV1 } from "./types.js";
-import { serializeLogEntry, validateLogEntry } from "./schema.js";
+import {
+  sanitizeSerializedLine,
+  serializeLogEntry,
+  validateLogEntry,
+  type ValidateOptions,
+} from "./schema.js";
 
-export interface LoggerOptions {
+export interface LoggerOptions extends ValidateOptions {
   logDir: string;
-  strictSchema?: boolean;
 }
 
 export function ensureLogDir(logDir: string): void {
@@ -23,8 +27,11 @@ export function ensureLogDir(logDir: string): void {
 
 export function appendLogEntry(entry: LogEntryV1, options: LoggerOptions): void {
   ensureLogDir(options.logDir);
-  validateLogEntry(entry, options.strictSchema ?? false);
-  const day = entry.ts.slice(0, 10);
+  const cleaned = validateLogEntry(entry, {
+    strictSchema: options.strictSchema ?? true,
+    onUnknownKey: options.onUnknownKey ?? "drop",
+  });
+  const day = cleaned.ts.slice(0, 10);
   const file = `${options.logDir}/gapura-${day}.jsonl`;
   if (!existsSync(file)) {
     appendFileSync(file, "", { encoding: "utf8", mode: 0o600 });
@@ -34,7 +41,9 @@ export function appendLogEntry(entry: LogEntryV1, options: LoggerOptions): void 
       /* Windows belum diuji */
     }
   }
-  appendFileSync(file, serializeLogEntry(entry), { encoding: "utf8" });
+  let line = serializeLogEntry(cleaned).trimEnd();
+  line = sanitizeSerializedLine(line);
+  appendFileSync(file, line, { encoding: "utf8" });
   try {
     chmodSync(file, 0o600);
   } catch {

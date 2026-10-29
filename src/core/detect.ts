@@ -1,3 +1,4 @@
+import { normalizeForScan } from "./normalize.js";
 import { detectAll, PII_TYPES, type PiiType } from "@adindamochamad/tirai";
 import type { PiiCounts, TokenCounts } from "./types.js";
 
@@ -6,6 +7,15 @@ const TOKEN_RE = new RegExp(
   `\\[\\s*(${TOKEN_TYPES})\\s*_\\s*(\\d+)\\s*\\]`,
   "gi",
 );
+
+function maxMerge(a: PiiCounts, b: PiiCounts): PiiCounts {
+  const out: PiiCounts = { ...a };
+  for (const [k, v] of Object.entries(b)) {
+    const n = v ?? 0;
+    out[k] = Math.max(out[k] ?? 0, n);
+  }
+  return out;
+}
 
 export function countPiiInText(text: string): PiiCounts {
   const matches = detectAll(text);
@@ -17,12 +27,17 @@ export function countPiiInText(text: string): PiiCounts {
   return counts;
 }
 
+/** Maksimum hitungan dari teks asli dan varian ternormalisasi (bukan jumlah). */
+export function countPiiInTextPair(text: string): PiiCounts {
+  return maxMerge(countPiiInText(text), countPiiInText(normalizeForScan(text)));
+}
+
 export function countPiiInTexts(texts: string[]): PiiCounts {
   const merged: PiiCounts = {};
   for (const text of texts) {
-    const part = countPiiInText(text);
+    const part = countPiiInTextPair(text);
     for (const [k, v] of Object.entries(part)) {
-      merged[k] = (merged[k] ?? 0) + (v ?? 0);
+      merged[k] = Math.max(merged[k] ?? 0, v ?? 0);
     }
   }
   return merged;
@@ -41,21 +56,32 @@ export function countTiraiTokens(text: string): TokenCounts {
   return counts;
 }
 
+function maxMergeTokens(a: TokenCounts, b: TokenCounts): TokenCounts {
+  const out: TokenCounts = { ...a };
+  for (const [k, v] of Object.entries(b)) {
+    out[k] = Math.max(out[k] ?? 0, v ?? 0);
+  }
+  return out;
+}
+
+function countTiraiTokensPair(text: string): TokenCounts {
+  return maxMergeTokens(
+    countTiraiTokens(text),
+    countTiraiTokens(normalizeForScan(text)),
+  );
+}
+
 export function countTiraiTokensInTexts(texts: string[]): TokenCounts {
   const merged: TokenCounts = {};
   for (const text of texts) {
-    const part = countTiraiTokens(text);
+    const part = countTiraiTokensPair(text);
     for (const [k, v] of Object.entries(part)) {
-      merged[k] = (merged[k] ?? 0) + (v ?? 0);
+      merged[k] = Math.max(merged[k] ?? 0, v ?? 0);
     }
   }
   return merged;
 }
 
 export function totalCount(counts: PiiCounts | TokenCounts): number {
-  let sum = 0;
-  for (const v of Object.values(counts)) {
-    sum += v ?? 0;
-  }
-  return sum;
+  return Object.values(counts).reduce<number>((a, b) => a + (b ?? 0), 0);
 }

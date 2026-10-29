@@ -2,16 +2,16 @@ import { randomUUID } from "node:crypto";
 import type { CallStatus, GapuraConfig, LogEntryV1 } from "./types.js";
 import { DEFAULT_MAX_BODY_BYTES as MAX_BYTES } from "./types.js";
 import {
-  extractModelField,
-  extractStringsFromJson,
+  collectFromJson,
   tryParseJsonBody,
+  type JsonExtractState,
 } from "./extract.js";
-import {
-  countPiiInTexts,
-  countTiraiTokensInTexts,
-} from "./detect.js";
+import { extractSafeModelField } from "./modelField.js";
+import { countPiiInTexts, countTiraiTokensInTexts } from "./detect.js";
 import { classifyCall } from "./classify.js";
 import { resolveProvider } from "./providers.js";
+import { sanitizePathForLog } from "./pathLog.js";
+import type { Coverage, CoverageReason } from "./reasons.js";
 
 export interface ObserveInput {
   url: string;
@@ -26,28 +26,34 @@ export interface ObserveInput {
 
 export interface ObserveOutput {
   entry: LogEntryV1;
-  skippedReason?: string;
 }
 
-function pathWithoutQuery(url: URL): string {
-  return url.pathname || "/";
+function appendUrlScanTexts(url: URL, texts: string[]): void {
+  for (const [key, value] of url.searchParams.entries()) {
+    texts.push(key);
+    texts.push(value);
+  }
+  for (const part of url.pathname.split("/")) {
+    if (!part) continue;
+    try {
+      texts.push(decodeURIComponent(part));
+    } catch {
+      texts.push(part);
+    }
+  }
 }
 
-function shouldSkipBody(headers: Headers, bodyBytes: number, max: number): {
-  unchecked: boolean;
-  reason?: string;
-} {
+function bodySkipReasons(
+  headers: Headers,
+  bodyBytes: number,
+  max: number,
+): CoverageReason[] {
+  const reasons: CoverageReason[] = [];
   const ct = (headers.get("content-type") ?? "").toLowerCase();
-  if (ct.includes("multipart/form-data")) {
-    return { unchecked: true, reason: "multipart" };
-  }
-  if (headers.get("content-encoding")) {
-    return { unchecked: true, reason: "content-encoding" };
-  }
-  if (bodyBytes > max) {
-    return { unchecked: true, reason: "too-large" };
-  }
-  return { unchecked: false };
+  if (ct.includes("multipart/form-data")) reasons.push("multipart");
+  if (headers.get("content-encoding")) reasons.push("compressed");
+  if (bodyBytes > max) reasons.push("too-large");
+  return reasons;
 }
 
 export function observeHttpRequest(input: ObserveInput): ObserveOutput {
@@ -55,31 +61,59 @@ export function observeHttpRequest(input: ObserveInput): ObserveOutput {
   const url = new URL(input.url);
   const { provider, region_ref } = resolveProvider(url.hostname, input.config);
 
-  let status: CallStatus = "unchecked";
-  let pii = {};
-  let tokens = {};
+  const scanTexts: string[] = [];
+  appendUrlScanTexts(url, scanTexts);
+
+  const reasons = new Set<CoverageReason>();
+  const skipReasons = bodySkipReasons(input.headers, input.bodyBytes, max);
+  for (const r of skipReasons) reasons.add(r);
+
   let model: string | undefined;
 
-  const skip = shouldSkipBody(input.headers, input.bodyBytes, max);
-
   if (input.bodyText === null) {
-    status = "unchecked";
-  } else if (skip.unchecked) {
-    status = "unchecked";
-  } else if (!input.bodyText.trim()) {
-    status = classifyCall({}, {}, false);
-  } else {
-    const parsed = tryParseJsonBody(input.bodyText);
-    if (parsed === null) {
-      status = "unchecked";
-    } else {
-      const strings: string[] = [];
-      extractStringsFromJson(parsed, strings);
-      pii = countPiiInTexts(strings);
-      tokens = countTiraiTokensInTexts(strings);
-      model = extractModelField(parsed);
-      status = classifyCall(pii, tokens, false);
+    if (!skipReasons.includes("too-large") && input.bodyBytes <= max) {
+      reasons.add("stream-not-inspected");
     }
+  } else if (skipReasons.length === 0) {
+    if (!input.bodyText.trim()) {
+      /* empty body — tidak ada yang dipindai di body */
+    } else {
+      const ct = (input.headers.get("content-type") ?? "").toLowerCase();
+      if (ct && !ct.includes("json")) {
+        reasons.add("unsupported-content-type");
+      }
+      const parsed = tryParseJsonBody(input.bodyText);
+      if (parsed === null) {
+        reasons.add("non-json");
+      } else {
+        const state: JsonExtractState = { texts: scanTexts, reasons: new Set() };
+        collectFromJson(parsed, state);
+        for (const r of state.reasons) reasons.add(r);
+        model = extractSafeModelField(parsed);
+      }
+    }
+  }
+
+  const pii = countPiiInTexts(scanTexts);
+  const tokens = countTiraiTokensInTexts(scanTexts);
+  const hitTotal =
+    Object.values(pii).reduce<number>((a, b) => a + (b ?? 0), 0) +
+    Object.values(tokens).reduce<number>((a, b) => a + (b ?? 0), 0);
+
+  const coverage: Coverage = reasons.size === 0 ? "full" : "partial";
+  let status: CallStatus;
+  if (hitTotal > 0) {
+    status = classifyCall(pii, tokens, {
+      coverage: "partial",
+      forceUnchecked: false,
+    });
+  } else if (skipReasons.includes("too-large") || input.bodyBytes > max) {
+    status = "unchecked";
+  } else {
+    status = classifyCall(pii, tokens, {
+      coverage,
+      forceUnchecked: false,
+    });
   }
 
   const entry: LogEntryV1 = {
@@ -88,18 +122,20 @@ export function observeHttpRequest(input: ObserveInput): ObserveOutput {
     ts: new Date().toISOString(),
     provider: provider.id,
     host: url.hostname,
-    path: pathWithoutQuery(url),
+    path: sanitizePathForLog(url.pathname || "/"),
     status,
     pii,
     tokens,
     bytes: input.bodyBytes,
     region_ref,
+    coverage,
   };
 
+  if (reasons.size > 0) entry.reasons = [...reasons];
   if (model) entry.model = model;
   if (input.label) entry.label = input.label;
 
-  return { entry, skippedReason: skip.reason };
+  return { entry };
 }
 
 function parseContentLength(headers: Headers): number | null {

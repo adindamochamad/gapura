@@ -100,7 +100,8 @@ describe("detection edge cases", () => {
     const body = { only: blob };
     const strings: string[] = [];
     extractStringsFromJson(body, strings);
-    expect(strings.length).toBe(0);
+    expect(strings).not.toContain(blob);
+    expect(strings).toEqual(["only"]);
   });
 
   it("known miss: unlabeled name not counted as NAMA", () => {
@@ -122,7 +123,7 @@ describe("detection edge cases", () => {
     const { redacted } = redact(raw);
     const pii = countPiiInTexts([redacted]);
     const tok = countTiraiTokensInTexts([redacted]);
-    expect(classifyCall(pii, tok, false)).toBe("masked");
+    expect(classifyCall(pii, tok, { coverage: "full" })).toBe("masked");
   });
 });
 

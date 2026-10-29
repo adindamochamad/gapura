@@ -15,6 +15,7 @@ const sampleEntry: LogEntryV1 = {
   pii: { NIK: 1 },
   tokens: {},
   bytes: 100,
+  coverage: "full",
   region_ref: {
     provider_id: "local",
     processing_region: "tidak keluar mesin (kategori khusus)",
