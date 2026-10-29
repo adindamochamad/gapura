@@ -95,4 +95,4 @@ if (failures.length) {
   console.error("mockup:check FAILED\n" + failures.map((f) => `  - ${f}`).join("\n"));
   process.exit(1);
 }
-console.log("mockup:check: P0 otomatis lulus (P0 manual C2–C5, D2, E3–E4 masih dicentang manusia).");
+console.log("mockup:check: P0 otomatis lulus. P0 manual: lihat design/DOD.md § Bukti manual + Status.");

@@ -106,6 +106,6 @@ Mockup pitch **sengaja tidak** di-host sebagai SaaS publik: produk rilis Gapura 
 
 | Tanggal | Commit | P0 otomatis | P0 manual | Catatan |
 | --- | --- | --- | --- | --- |
-| 2026-10-29 | *(isi setelah push)* | `npm run mockup:check` → 0 | C1–C5, D2, E4 § di atas | E5: `npm test` 127 passed; `lint:forbidden` bersih |
+| 2026-10-29 | `f3d4def` | `npm run mockup:check` → 0 | C1–C5, D2, E4 § di atas | E5: `npm test` 127 passed; `lint:forbidden` bersih |
 
 Isi hash commit di baris ini di PR yang mengklaim DoD tertutup. Tanpa itu, klaim ditolak.
