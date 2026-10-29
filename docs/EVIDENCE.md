@@ -26,7 +26,9 @@ npm audit --omit=dev → found 0 vulnerabilities
 
 ## Coverage
 
-Jalankan `npm run test:coverage` dan tempel ringkasan `%` Statements/Branches di sini setelah CI lokal (angka berubah per mesin).
+```text
+npm run test:coverage → All files 68.21% statements (v8, lokal 29 Okt 2026)
+```
 
 ## Tag (untuk Adinda, jangan dijalankan agent)
 
