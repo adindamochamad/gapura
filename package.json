@@ -34,6 +34,7 @@
     "test:watch": "vitest",
     "demo": "node dist/cli/main.js demo --out ./gapura-demo-out",
     "verify:pack": "node scripts/verify-pack.mjs",
+    "mutation:check": "node scripts/mutation-check.mjs",
     "test:coverage": "vitest run --coverage",
     "lint:forbidden": "node scripts/check-forbidden-words.mjs",
     "lint:secrets": "node scripts/check-secrets.mjs",

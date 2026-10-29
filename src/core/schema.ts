@@ -133,13 +133,7 @@ export function validateLogEntry(
   return cleaned;
 }
 
-export function sanitizeSerializedLine(jsonLine: string): string {
-  let obj: Record<string, unknown>;
-  try {
-    obj = JSON.parse(jsonLine) as Record<string, unknown>;
-  } catch {
-    return `${jsonLine}\n`;
-  }
+function scrubPiiFromJson(obj: Record<string, unknown>): string[] {
   const droppedFields: string[] = [];
   for (const key of Object.keys(obj)) {
     const val = obj[key];
@@ -149,8 +143,21 @@ export function sanitizeSerializedLine(jsonLine: string): string {
         delete obj[key];
         droppedFields.push(key);
       }
+    } else if (val !== null && typeof val === "object" && !Array.isArray(val)) {
+      droppedFields.push(...scrubPiiFromJson(val as Record<string, unknown>));
     }
   }
+  return droppedFields;
+}
+
+export function sanitizeSerializedLine(jsonLine: string): string {
+  let obj: Record<string, unknown>;
+  try {
+    obj = JSON.parse(jsonLine) as Record<string, unknown>;
+  } catch {
+    return `${jsonLine}\n`;
+  }
+  const droppedFields = scrubPiiFromJson(obj);
   for (const f of droppedFields) {
     console.error(`gapura: dropped log field after scan: ${f}`);
   }

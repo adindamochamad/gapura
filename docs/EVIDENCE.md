@@ -8,13 +8,20 @@ Diperbarui 29 Okt 2026 (WIB). Output di bawah dari branch `fix/v0.1.1-review` lo
 npm run typecheck          → exit 0
 npm run lint:forbidden     → No forbidden marketing/compliance words found.
 npm run lint:secrets       → (exit 0)
-npx vitest run             → 17 files, 105 tests passed
+npx vitest run             → 17 files, 106 tests passed
+npm run mutation:check     → Semua mutasi M1–M14 tertangkap tes.
 npm run build              → exit 0
 npm run demo               → gapura-demo-out/ (3 baris log)
 npm run verify:pack        → verify-pack: ok
 ```
 
-Baseline v0.1.0: **72** tes. Setelah perbaikan: **105** tes.
+Baseline v0.1.0: **72** tes. Setelah perbaikan: **106** tes.
+
+## Mutasi M1–M14
+
+```text
+npm run mutation:check → 14/14 caught (lokal 29 Okt 2026)
+```
 
 ## npm audit
 
@@ -22,7 +29,7 @@ Baseline v0.1.0: **72** tes. Setelah perbaikan: **105** tes.
 npm audit --omit=dev → found 0 vulnerabilities
 ```
 
-(Jalankan `npm audit` penuh untuk devDependencies; vitest/esbuild mungkin masih melaporkan celah dev — catat angka saat rilis.)
+(Jalankan `npm audit` penuh untuk devDependencies; vitest/vite mungkin masih melaporkan celah dev — **jangan** `npm audit fix --force` tanpa review.)
 
 ## Coverage
 

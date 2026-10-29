@@ -33,9 +33,9 @@ const base: LogEntryV2 = {
 
 describe("allowlist writer", () => {
   it("rejects unknown keys in strict mode with throw", () => {
-    const bad = { ...base, secret: "nope" } as LogEntryV1 & { secret: string };
+    const bad = { ...base, secret: "nope" } as LogEntryV2 & { secret: string };
     expect(() =>
-      validateLogEntry(bad as unknown as LogEntryV1, {
+      validateLogEntry(bad as unknown as LogEntryV2, {
         strictSchema: true,
         onUnknownKey: "throw",
       }),
@@ -43,11 +43,28 @@ describe("allowlist writer", () => {
   });
 
   it("drops unknown keys by default", () => {
-    const bad = { ...base, secret_prompt: "nope" } as LogEntryV1 & {
+    const bad = { ...base, secret_prompt: "nope" } as LogEntryV2 & {
       secret_prompt: string;
     };
-    const cleaned = dropUnknownKeys(bad as unknown as LogEntryV1, {});
+    const cleaned = dropUnknownKeys(bad as unknown as LogEntryV2, {});
     expect((cleaned as Record<string, unknown>).secret_prompt).toBeUndefined();
+  });
+
+  it("appendLogEntry strips PII from serialized string fields", () => {
+    const logDir = mkdtempSync(join(tmpdir(), "gapura-schema-label-"));
+    appendLogEntry(
+      {
+        ...base,
+        region_ref: {
+          ...base.region_ref,
+          processing_region: "NIK 3171010101010000",
+        },
+      },
+      { logDir },
+    );
+    const content = readFileSync(join(logDir, readdirSync(logDir)[0]!), "utf8");
+    expect(content).not.toContain("3171010101010000");
+    rmSync(logDir, { recursive: true, force: true });
   });
 
   it("appendLogEntry drops foreign keys from file", () => {
@@ -56,7 +73,7 @@ describe("allowlist writer", () => {
       {
         ...base,
         secret_prompt: "Budi 3171010101010000",
-      } as LogEntryV1 & { secret_prompt: string },
+      } as LogEntryV2 & { secret_prompt: string },
       { logDir },
     );
     const content = readFileSync(join(logDir, readdirSync(logDir)[0]!), "utf8");
